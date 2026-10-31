@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Language } from '../utils/i18n';
 import { soundManager } from '../utils/soundManager';
+import { submitVipWaitlistEntry } from '../services/vipWaitlistService';
 import logoImg from '../assets/logo.png';
 
 interface PremiumUpgradePageProps {
@@ -195,27 +196,19 @@ export const PremiumUpgradePage: React.FC<PremiumUpgradePageProps> = ({
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       soundManager.playCorrect();
     } catch (_) {}
 
-    try {
-      const existingEntries = JSON.parse(
-        localStorage.getItem('time_trace_premium_waitlist') || '[]'
-      );
-      const newEntry = {
-        contact: contactInput.trim() || 'Anonymous Explorer',
-        preferredPrice,
-        selectedFeatures,
-        timestamp: new Date().toISOString(),
-      };
-      existingEntries.push(newEntry);
-      localStorage.setItem('time_trace_premium_waitlist', JSON.stringify(existingEntries));
-      setWaitlistNumber(142 + existingEntries.length);
-    } catch (_) {}
+    const result = await submitVipWaitlistEntry({
+      contact: contactInput.trim() || 'Anonymous Explorer',
+      preferredPrice,
+      selectedFeatures,
+    });
 
+    setWaitlistNumber(result.waitlistNumber);
     setSubmitted(true);
   };
 

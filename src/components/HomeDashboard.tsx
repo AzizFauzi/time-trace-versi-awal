@@ -28,6 +28,8 @@ import {
   ArrowRight,
   Crown,
   List,
+  Edit3,
+  Check,
 } from 'lucide-react';
 import { PlayerProgress, PlayerRank, DailyChances } from '../utils/progress';
 import { GamificationState } from '../utils/gamification';
@@ -38,6 +40,7 @@ import { getExploredLocations } from '../utils/cityImageHelper';
 import { getRankAssetByStars } from '../utils/rankAssets';
 import { soundManager } from '../utils/soundManager';
 import { BlogArticle, BLOG_ARTICLES } from '../data/blogArticles';
+import { fetchLeaderboard, getPlayerNickname, setPlayerNickname, LeaderboardPlayer } from '../services/leaderboardService';
 import { BlogReaderModal } from './BlogReaderModal';
 import logoImg from '../assets/logo.png';
 
@@ -270,14 +273,37 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
     return city;
   };
 
-  // Mock Leaderboard ranking list synced with player's real score
-  const leaderboardUsers = [
-    { rank: 1, name: 'ArchExplorer', score: 2540, avatar: '🧙‍♂️', badge: '🥇' },
-    { rank: 2, name: 'HistoriaHunter', score: 2110, avatar: '🕵️', badge: '🥈' },
-    { rank: 3, name: 'MapDetective', score: 1980, avatar: '🧭', badge: '🥉' },
-    { rank: 4, name: isEn ? 'TimeWalker (You)' : 'TimeWalker (Anda)', score: Math.max(1541, gamification.coins), avatar: '🎩', isCurrent: true, badge: '⭐' },
-    { rank: 5, name: 'GeoMystery', score: 1320, avatar: '🗺️', badge: '5' },
-  ];
+  const [playerNickname, setPlayerNicknameState] = useState<string>(getPlayerNickname());
+  const [leaderboardList, setLeaderboardList] = useState<LeaderboardPlayer[]>([]);
+  const [isLiveLeaderboard, setIsLiveLeaderboard] = useState<boolean>(false);
+  const [isEditingNickname, setIsEditingNickname] = useState<boolean>(false);
+  const [nicknameDraft, setNicknameDraft] = useState<string>(playerNickname);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchLeaderboard(gamification.coins, leaderboardPeriod).then((res) => {
+      if (isMounted) {
+        setLeaderboardList(res.players);
+        setIsLiveLeaderboard(res.isLive);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [leaderboardPeriod, gamification.coins, playerNickname]);
+
+  const handleSaveNickname = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = nicknameDraft.trim();
+    if (trimmed) {
+      setPlayerNickname(trimmed);
+      setPlayerNicknameState(trimmed);
+      try {
+        soundManager.playCorrect();
+      } catch (_) {}
+    }
+    setIsEditingNickname(false);
+  };
 
   const handleScrollCarousel = (direction: 'left' | 'right') => {
     if (direction === 'left') {
@@ -1074,6 +1100,16 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                 <h3 className="text-sm sm:text-base font-black text-white">
                   {isEn ? 'Leaderboard' : 'Papan Peringkat'}
                 </h3>
+                {isLiveLeaderboard ? (
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-[10px] font-bold text-emerald-400 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Live
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-[10px] font-semibold text-slate-400">
+                    Global
+                  </span>
+                )}
               </div>
 
               {/* Period Dropdown Filter */}
@@ -1097,11 +1133,45 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               </div>
             </div>
 
+            {/* Nickname Editor Drawer */}
+            {isEditingNickname && (
+              <form onSubmit={handleSaveNickname} className="p-3 bg-slate-900 border border-amber-400/50 rounded-2xl space-y-2 animate-fade-in">
+                <div className="text-[11px] font-bold text-amber-300 flex items-center justify-between">
+                  <span>{isEn ? 'Set Your Detective Nickname:' : 'Ganti Nama Panggilan Detektif Anda:'}</span>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    maxLength={18}
+                    value={nicknameDraft}
+                    onChange={(e) => setNicknameDraft(e.target.value)}
+                    placeholder={isEn ? 'Detective Name...' : 'Nama Panggilan...'}
+                    className="flex-1 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-amber-400 font-bold"
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-300 hover:to-yellow-200 text-slate-950 font-black text-xs transition cursor-pointer flex items-center gap-1 shadow-sm"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    {isEn ? 'Save' : 'Simpan'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingNickname(false)}
+                    className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
+                  >
+                    {isEn ? 'Cancel' : 'Batal'}
+                  </button>
+                </div>
+              </form>
+            )}
+
             {/* Leaderboard Players List */}
             <div className="space-y-2">
-              {leaderboardUsers.map((user) => (
+              {leaderboardList.map((user) => (
                 <div
-                  key={user.rank}
+                  key={`${user.rank}-${user.name}`}
                   className={`flex items-center justify-between p-2.5 rounded-2xl border transition ${
                     user.isCurrent
                       ? 'bg-gradient-to-r from-amber-500/15 to-yellow-500/10 border-amber-400/80 shadow-md shadow-amber-500/10'
@@ -1120,11 +1190,25 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                     </div>
 
                     {/* Player Name */}
-                    <span className={`text-xs font-bold truncate max-w-[130px] ${
-                      user.isCurrent ? 'text-amber-300' : 'text-slate-200'
-                    }`}>
-                      {user.name}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`text-xs font-bold truncate max-w-[130px] ${
+                        user.isCurrent ? 'text-amber-300' : 'text-slate-200'
+                      }`}>
+                        {user.name}
+                      </span>
+                      {user.isCurrent && (
+                        <button
+                          onClick={() => {
+                            setNicknameDraft(playerNickname);
+                            setIsEditingNickname(true);
+                          }}
+                          title={isEn ? 'Edit Nickname' : 'Ubah Nama'}
+                          className="p-1 rounded hover:bg-amber-400/20 text-amber-300 cursor-pointer"
+                        >
+                          <Edit3 className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   {/* Score */}
@@ -1135,6 +1219,23 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                   </span>
                 </div>
               ))}
+            </div>
+
+            {/* Footer with Edit Nickname trigger */}
+            <div className="pt-1 flex items-center justify-between text-[11px] border-t border-slate-800/50">
+              <button
+                onClick={() => {
+                  setNicknameDraft(playerNickname);
+                  setIsEditingNickname((prev) => !prev);
+                }}
+                className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1.5 cursor-pointer transition hover:underline"
+              >
+                <Edit3 className="w-3.5 h-3.5" />
+                <span>{isEn ? 'Customize Detective Nickname' : 'Ganti Nama Panggilan'}</span>
+              </button>
+              <span className="text-slate-500 font-mono text-[10px]">
+                {isLiveLeaderboard ? (isEn ? 'Online Sync' : 'Tersinkron Cloud') : (isEn ? 'Offline / Auto' : 'Mode Otomatis')}
+              </span>
             </div>
           </div>
 

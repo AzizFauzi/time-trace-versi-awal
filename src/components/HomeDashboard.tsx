@@ -311,95 +311,28 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </span>
           </div>
 
-          {/* Navigation Pill Links */}
-          <nav className="hidden md:flex items-center gap-1.5 lg:gap-2 text-xs font-semibold">
-            {/* Beranda */}
-            <button
-              onClick={() => setActiveNav('beranda')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition cursor-pointer ${
-                activeNav === 'beranda'
-                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 shadow-sm shadow-amber-500/10'
-                  : 'bg-transparent border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-              }`}
-            >
-              <span>🏠</span>
-              <span>{isEn ? 'Home' : 'Beranda'}</span>
-            </button>
-
-            {/* Ekspedisi */}
+          {/* Streamlined Navigation Links */}
+          <nav className="hidden xl:flex items-center gap-2 text-xs font-semibold">
             <button
               onClick={() => {
                 setActiveNav('ekspedisi');
-                onStartExpedition('global');
+                document.getElementById('modes-grid')?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition cursor-pointer"
             >
               <Compass className="w-3.5 h-3.5 text-blue-400" />
-              <span>{isEn ? 'Expedition' : 'Ekspedisi'}</span>
+              <span>{isEn ? 'Game Modes' : 'Mode Permainan'}</span>
             </button>
 
-            {/* Arsip / 100 Level */}
-            <button
-              onClick={() => {
-                setActiveNav('arsip');
-                onOpenLevelSelector();
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition cursor-pointer"
-            >
-              <FolderArchive className="w-3.5 h-3.5 text-amber-400" />
-              <span>{isEn ? 'Archives' : 'Arsip'}</span>
-            </button>
-
-            {/* Papan Peringkat */}
-            <button
-              onClick={() => {
-                setActiveNav('leaderboard');
-                onOpenPassport('history');
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition cursor-pointer"
-            >
-              <Trophy className="w-3.5 h-3.5 text-yellow-400" />
-              <span>{isEn ? 'Leaderboard' : 'Papan Peringkat'}</span>
-            </button>
-
-            {/* Prestasi */}
-            <button
-              onClick={() => {
-                setActiveNav('prestasi');
-                onOpenPassport('achievements');
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition cursor-pointer"
-            >
-              <Award className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{isEn ? 'Achievements' : 'Prestasi'}</span>
-            </button>
-
-            {/* Paspor */}
-            <button
-              onClick={() => {
-                setActiveNav('paspor');
-                onOpenPassport('stats');
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition cursor-pointer"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
-              <span>{isEn ? 'Passport' : 'Paspor'}</span>
-            </button>
-
-            {/* Warta / Jurnal */}
             <button
               onClick={() => {
                 setActiveNav('warta');
                 document.getElementById('warta-section')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition cursor-pointer ${
-                activeNav === 'warta'
-                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 shadow-sm shadow-amber-500/10'
-                  : 'bg-transparent border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-              }`}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition cursor-pointer"
             >
               <Newspaper className="w-3.5 h-3.5 text-rose-400" />
-              <span>{isEn ? 'Journal' : 'Warta'}</span>
+              <span>{isEn ? 'Journal' : 'Warta Sejarah'}</span>
             </button>
           </nav>
         </div>
@@ -451,25 +384,6 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             <span>{gamification.dailyStreak} {isEn ? 'days' : 'hari'}</span>
           </div>
 
-          {/* Search Icon Button */}
-          <button
-            onClick={() => setSearchOpen(!searchOpen)}
-            className="p-1.5 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 transition cursor-pointer"
-            title={isEn ? 'Search Cases & Regions' : 'Cari Kasus & Wilayah'}
-          >
-            <Search className="w-4 h-4" />
-          </button>
-
-          {/* Notifications Icon Button */}
-          <button
-            onClick={onOpenHowToPlay}
-            className="p-1.5 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 transition relative cursor-pointer"
-            title={isEn ? 'Guide & Notifications' : 'Panduan & Notifikasi'}
-          >
-            <Bell className="w-4 h-4" />
-            <span className="w-2 h-2 rounded-full bg-amber-400 absolute top-1 right-1 ring-2 ring-slate-900" />
-          </button>
-
           {/* Sound Audio Toggle */}
           <button
             onClick={onToggleMute}
@@ -508,20 +422,6 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               EN
             </button>
           </div>
-
-          {/* Claim Gelar Trophy Pill (when 100 levels finished) */}
-          {is100Completed && onOpenClaimGelar && (
-            <button
-              onClick={onOpenClaimGelar}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-amber-500/25 via-yellow-400/30 to-amber-500/25 border border-amber-400/70 text-amber-300 text-xs font-bold hover:border-amber-300 transition cursor-pointer shadow-md shadow-amber-500/10 animate-pulse"
-              title={isEn ? 'Claim / View 100-Case Detective Rank & Diploma' : 'Klaim / Lihat Piagam & Gelar Detektif 100 Kasus'}
-            >
-              <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span className="hidden sm:inline font-mono font-bold">
-                {isTitleClaimed ? (isEn ? 'Title Conferred 📜' : 'Gelar Terklaim 📜') : (isEn ? 'Claim Title 👑' : 'Klaim Gelar 👑')}
-              </span>
-            </button>
-          )}
 
           {/* Profile Badge (Avatar + Rank + Level XP Bar) */}
           <div

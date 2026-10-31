@@ -1,1 +1,1 @@
-feat: restore pure Google Street View & Google Maps engine with 5 daily cases restriction and VIP Pass Coming Soon modal
+refactor: declutter and streamline HomeDashboard header navigation

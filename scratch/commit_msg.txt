@@ -1,1 +1,1 @@
-refactor: declutter and streamline HomeDashboard header navigation
+feat: update VIP Pass lifetime to Rp 100.000 and highlight 100% ad-free experience

@@ -136,5 +136,9 @@ Aplikasi memiliki 4 mode permainan yang terpisah:
    * Jatah 4–5 kasus gratis per hari (cukup di dalam kuota gratis $200 Google).
    * Disertai iklan non-intrusif dan **Rewarded Video Ads** (nonton video 15 detik = dapat +2 kasus tambahan).
 2. **Premium Tier (Berbayar / VIP Pass):**
-   * **Beli Putus Sekali Bayar (Lifetime Pass):** Rp 29.000 – Rp 49.000 via QRIS.
-   * **Keuntungan:** Akses 100% tanpa batas (*Unlimited Cases*), bebas iklan selamanya (*Ad-Free*), bebas memilih seluruh 50 kasus Indonesia dan 100 kasus dunia, serta lencana VIP di paspor.
+   * **Beli Putus Sekali Bayar (Lifetime Pass):** **Rp 100.000** (Sekali Beli Seumur Hidup).
+   * **Keuntungan Utama:**
+     * **100% Bebas Iklan Selamanya (Zero Ads Guaranteed)** tanpa banner maupun video sponsor.
+     * **Akses Tanpa Batas Kuota (*Unlimited Daily Cases*)**, main sepuasnya tanpa menunggu reset jam 00:00.
+     * Bebas memilih seluruh 50 kasus Indonesia dan 100 kasus dunia secara instan.
+     * Lencana eksklusif VIP Crown di Paspor Waktu & Papan Peringkat.

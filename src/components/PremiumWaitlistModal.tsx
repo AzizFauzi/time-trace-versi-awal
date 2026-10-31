@@ -44,7 +44,7 @@ export const PremiumWaitlistModal: React.FC<PremiumWaitlistModalProps> = ({
     'before_after',
   ]);
   const [contactInput, setContactInput] = useState<string>('');
-  const [preferredPrice, setPreferredPrice] = useState<string>('one_time_29k');
+  const [preferredPrice, setPreferredPrice] = useState<string>('one_time_100k');
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [waitlistNumber, setWaitlistNumber] = useState<number>(142);
 
@@ -216,6 +216,22 @@ export const PremiumWaitlistModal: React.FC<PremiumWaitlistModalProps> = ({
                 ? 'We are finalizing the ultimate Time Trace PRO expansion. Help us prioritize your favorite features and secure a 50% Early Detective launch discount!'
                 : 'Kami sedang menyiapkan ekspansi terlengkap Time Trace PRO. Pilih fitur impian Anda di bawah dan dapatkan Diskon Peluncuran 50% saat rilis resmi!'}
             </p>
+
+            {/* VIP Pass Value Badges */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-semibold">
+              <span className="flex items-center gap-1.5 bg-amber-500/20 border border-amber-400/50 px-2.5 py-1 rounded-xl text-amber-300 shadow-sm font-mono">
+                <Crown className="w-3.5 h-3.5 text-amber-400" />
+                <span>{isEn ? 'Rp 100,000 Lifetime Pass' : 'Rp 100.000 Sekali Bayar Selamanya'}</span>
+              </span>
+              <span className="flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-400/50 px-2.5 py-1 rounded-xl text-emerald-300 shadow-sm font-mono">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{isEn ? '100% Ad-Free Forever' : '100% Bebas Iklan Selamanya'}</span>
+              </span>
+              <span className="flex items-center gap-1.5 bg-cyan-500/20 border border-cyan-400/50 px-2.5 py-1 rounded-xl text-cyan-300 shadow-sm font-mono">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                <span>{isEn ? 'Unlimited Daily Cases' : 'Akses Kasus Tanpa Batas'}</span>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -315,9 +331,9 @@ export const PremiumWaitlistModal: React.FC<PremiumWaitlistModalProps> = ({
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   {[
-                    { id: 'one_time_29k', label: 'Rp 29.000 (Sekali Beli Selamanya)', sub: isEn ? 'Lifetime Pass' : 'Beli Putus' },
-                    { id: 'sub_15k', label: 'Rp 15.000 / Bulan', sub: isEn ? 'Monthly Sub' : 'Langganan' },
-                    { id: 'free_with_ads', label: isEn ? 'Free (Keep Ads)' : 'Tetap Gratis Saja (Ada Iklan)', sub: isEn ? 'Ad-supported' : 'Didukung Iklan' },
+                    { id: 'one_time_100k', label: 'Rp 100.000 (Sekali Beli Selamanya)', sub: isEn ? 'Lifetime Pass • 100% Ad-Free & Unlimited' : 'Beli Putus Seumur Hidup • 100% Bebas Iklan & Tanpa Batas' },
+                    { id: 'sub_25k', label: 'Rp 25.000 / Bulan', sub: isEn ? 'Monthly Sub • Ad-Free' : 'Langganan Bulanan • Bebas Iklan' },
+                    { id: 'free_with_ads', label: isEn ? 'Free (Keep Ads & 5 Daily Cases)' : 'Tetap Gratis Saja (Ada Iklan & Kuota 5 Kasus/Hari)', sub: isEn ? 'Standard Free' : 'Akun Standar Gratis' },
                   ].map((p) => (
                     <label
                       key={p.id}

@@ -53,7 +53,7 @@ export const PremiumUpgradePage: React.FC<PremiumUpgradePageProps> = ({
     'before_after',
   ]);
   const [contactInput, setContactInput] = useState<string>('');
-  const [preferredPrice, setPreferredPrice] = useState<string>('one_time_29k');
+  const [preferredPrice, setPreferredPrice] = useState<string>('one_time_100k');
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [waitlistNumber, setWaitlistNumber] = useState<number>(142);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -627,9 +627,9 @@ export const PremiumUpgradePage: React.FC<PremiumUpgradePageProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[
-                    { id: 'one_time_29k', label: 'Rp 29.000 (Sekali Beli Selamanya)', sub: isEn ? 'Lifetime Pass (Most Popular)' : 'Beli Putus Seumur Hidup' },
-                    { id: 'sub_15k', label: 'Rp 15.000 / Bulan', sub: isEn ? 'Monthly Subscription' : 'Langganan Fleksibel' },
-                    { id: 'free_with_ads', label: isEn ? 'Keep It 100% Free with Ads' : 'Tetap Gratis Saja (Didukung Iklan)', sub: isEn ? 'Ad-supported tier' : 'Tanpa bayar sama sekali' },
+                    { id: 'one_time_100k', label: 'Rp 100.000 (Sekali Beli Selamanya)', sub: isEn ? 'Lifetime Pass • 100% Ad-Free & Unlimited' : 'Beli Putus Seumur Hidup • 100% Bebas Iklan & Tanpa Batas' },
+                    { id: 'sub_25k', label: 'Rp 25.000 / Bulan', sub: isEn ? 'Monthly Subscription • Ad-Free' : 'Langganan Fleksibel • Bebas Iklan' },
+                    { id: 'free_with_ads', label: isEn ? 'Keep It Free with Ads & 5 Daily Cases' : 'Tetap Gratis Saja (Didukung Iklan & 5 Kasus/Hari)', sub: isEn ? 'Standard free tier' : 'Tanpa bayar sama sekali' },
                   ].map((p) => (
                     <label
                       key={p.id}

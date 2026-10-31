@@ -9,7 +9,9 @@ import {
 } from './data/challenges';
 import { calculateHaversineDistanceKm, calculateLocationScore, calculateYearScore, MINIMUM_PASS_SCORE } from './utils/scoring';
 import { StreetViewViewer } from './components/StreetViewViewer';
+import { WebGLPanoramaViewer } from './components/WebGLPanoramaViewer';
 import { GuessMap } from './components/GuessMap';
+import { LeafletGuessMap } from './components/LeafletGuessMap';
 import { YearPickerTimeline } from './components/YearPickerTimeline';
 import { ChronoGearPanel } from './components/ChronoGearPanel';
 import { RoundResultModal } from './components/RoundResultModal';
@@ -99,6 +101,12 @@ const DEFAULT_TOTAL_ROUNDS = 5;
 export default function App() {
   const [mapsLoaded, setMapsLoaded] = useState<boolean>(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+
+  // Engine Mode: 'webgl' (100% Free Open-Source Rp 0, Default) or 'google' (Google Maps & Street View API)
+  const [engineMode, setEngineMode] = useState<'webgl' | 'google'>(() => {
+    const saved = localStorage.getItem('time_trace_engine');
+    return saved === 'google' ? 'google' : 'webgl';
+  });
 
   // Localization & Region State
   const [lang, setLang] = useState<Language>(() => {
@@ -1006,6 +1014,39 @@ export default function App() {
             <span className="hidden md:inline">{lang === 'en' ? 'How to Play' : 'Cara Bermain'}</span>
           </button>
 
+          {/* Engine Mode Toggle (WebGL 360° Rp 0 vs Google Maps Live API) */}
+          <button
+            onClick={() => {
+              const next = engineMode === 'webgl' ? 'google' : 'webgl';
+              setEngineMode(next);
+              localStorage.setItem('time_trace_engine', next);
+              soundManager.playTick();
+              showChronoToast(
+                next === 'webgl'
+                  ? (lang === 'en' ? '✨ Switched to 360° WebGL + OSM (Rp 0 Free Selamanya)' : '✨ Beralih ke Mesin 360° WebGL + OSM (Rp 0 Bebas Kuota)')
+                  : (lang === 'en' ? '🌐 Switched to Google Maps Live API' : '🌐 Beralih ke Google Maps Live API')
+              );
+            }}
+            className={`px-2.5 py-1.5 rounded-xl border text-xs font-mono font-bold shadow-md transition cursor-pointer flex items-center gap-1.5 ${
+              engineMode === 'webgl'
+                ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-300 hover:bg-emerald-900/80 shadow-emerald-950/50'
+                : 'bg-blue-950/80 border-blue-500/50 text-blue-300 hover:bg-blue-900/80 shadow-blue-950/50'
+            }`}
+            title={
+              engineMode === 'webgl'
+                ? (lang === 'en' ? 'Current: 360° WebGL + OpenStreetMap (100% Free Rp 0). Click to switch to Google API.' : 'Mesin Aktif: 360° WebGL + OpenStreetMap (100% Gratis Rp 0). Klik untuk beralih ke Google API.')
+                : (lang === 'en' ? 'Current: Google Maps API. Click to switch to WebGL Rp 0.' : 'Mesin Aktif: Google Maps API. Klik untuk beralih ke WebGL Rp 0.')
+            }
+          >
+            <Sparkles className={`w-3.5 h-3.5 ${engineMode === 'webgl' ? 'text-emerald-400' : 'text-blue-400'}`} />
+            <span className="hidden sm:inline">
+              {engineMode === 'webgl' ? 'WebGL 360°' : 'Google API'}
+            </span>
+            <span className="px-1.5 py-0.2 rounded text-[10px] font-sans font-bold bg-black/40">
+              {engineMode === 'webgl' ? 'Rp 0' : 'API'}
+            </span>
+          </button>
+
           {/* Sound Effects Audio Toggle */}
           <button
             onClick={() => {
@@ -1073,18 +1114,29 @@ export default function App() {
         <AppBackground />
 
         {/* IN-GAME ACTIVE VIEW */}
-        {gameStarted && currentChallenge && mapsLoaded && (
+        {gameStarted && currentChallenge && (mapsLoaded || engineMode === 'webgl') && (
           <div className="relative w-full h-full">
-            {/* Street View Fullscreen 360 Viewer */}
+            {/* Fullscreen 360 Viewer (WebGL Rp 0 or Google Street View) */}
             <div className="absolute inset-0">
-              <StreetViewViewer
-                key={currentChallenge.id}
-                challenge={currentChallenge}
-                apiKey={API_KEY}
-                isInspecting={!roundConfirmed}
-                lang={lang}
-                activeFilter={gamification.activeFilter}
-              />
+              {engineMode === 'webgl' ? (
+                <WebGLPanoramaViewer
+                  key={currentChallenge.id}
+                  challenge={currentChallenge}
+                  apiKey={API_KEY}
+                  isInspecting={!roundConfirmed}
+                  lang={lang}
+                  activeFilter={gamification.activeFilter}
+                />
+              ) : (
+                <StreetViewViewer
+                  key={currentChallenge.id}
+                  challenge={currentChallenge}
+                  apiKey={API_KEY}
+                  isInspecting={!roundConfirmed}
+                  lang={lang}
+                  activeFilter={gamification.activeFilter}
+                />
+              )}
             </div>
 
             {/* Bottom-Left Floating Panel: Forensic Clues & Chrono Equipment */}
@@ -1288,16 +1340,28 @@ export default function App() {
                 />
               </div>
 
-              {/* Mini Map for Guessing Location */}
-              <GuessMap
-                onLocationSelected={setSelectedLocation}
-                selectedLocation={selectedLocation}
-                confirmed={roundConfirmed}
-                actualLocation={currentChallenge.realLocation}
-                lang={lang}
-                region={gameMode === 'campaign' || gameMode === 'daily' ? 'global' : gameMode === 'indonesia' ? 'indonesia' : selectedRegion}
-                theme={gamification.activeTheme}
-              />
+              {/* Mini Map for Guessing Location (Leaflet Rp 0 or Google Maps) */}
+              {engineMode === 'webgl' ? (
+                <LeafletGuessMap
+                  onLocationSelected={setSelectedLocation}
+                  selectedLocation={selectedLocation}
+                  confirmed={roundConfirmed}
+                  actualLocation={currentChallenge.realLocation}
+                  lang={lang}
+                  region={gameMode === 'campaign' || gameMode === 'daily' ? 'global' : gameMode === 'indonesia' ? 'indonesia' : selectedRegion}
+                  theme={gamification.activeTheme}
+                />
+              ) : (
+                <GuessMap
+                  onLocationSelected={setSelectedLocation}
+                  selectedLocation={selectedLocation}
+                  confirmed={roundConfirmed}
+                  actualLocation={currentChallenge.realLocation}
+                  lang={lang}
+                  region={gameMode === 'campaign' || gameMode === 'daily' ? 'global' : gameMode === 'indonesia' ? 'indonesia' : selectedRegion}
+                  theme={gamification.activeTheme}
+                />
+              )}
 
               {/* Submit Guess Action Button */}
               {!roundConfirmed && (

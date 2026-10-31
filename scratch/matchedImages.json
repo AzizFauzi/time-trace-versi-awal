@@ -1,0 +1,380 @@
+[
+  {
+    "lvl": 1,
+    "chapter": 1,
+    "city": "New York City",
+    "file": "L1_New York City.png"
+  },
+  {
+    "lvl": 2,
+    "chapter": 1,
+    "city": "Tokyo",
+    "file": "L1_Tokyo.png"
+  },
+  {
+    "lvl": 3,
+    "chapter": 1,
+    "city": "Jakarta",
+    "file": "L1_Jakarta.png"
+  },
+  {
+    "lvl": 4,
+    "chapter": 1,
+    "city": "London",
+    "file": "L1_London.png"
+  },
+  {
+    "lvl": 5,
+    "chapter": 1,
+    "city": "Paris",
+    "file": "L1_Paris.png"
+  },
+  {
+    "lvl": 6,
+    "chapter": 1,
+    "city": "Singapore",
+    "file": "L1_Singapura.png"
+  },
+  {
+    "lvl": 7,
+    "chapter": 1,
+    "city": "San Francisco",
+    "file": "L1_San Fransisco.png"
+  },
+  {
+    "lvl": 8,
+    "chapter": 1,
+    "city": "Berlin",
+    "file": "L1_Berlin.png"
+  },
+  {
+    "lvl": 10,
+    "chapter": 1,
+    "city": "Rome",
+    "file": "L1_Roma.png"
+  },
+  {
+    "lvl": 12,
+    "chapter": 1,
+    "city": "Sydney",
+    "file": "L1_Sydney.png"
+  },
+  {
+    "lvl": 14,
+    "chapter": 1,
+    "city": "Chicago",
+    "file": "L1_Chicago.png"
+  },
+  {
+    "lvl": 16,
+    "chapter": 1,
+    "city": "Los Angeles",
+    "file": "L1_Los Angeles.png"
+  },
+  {
+    "lvl": 17,
+    "chapter": 1,
+    "city": "Amsterdam",
+    "file": "L1_Amsterdam.png"
+  },
+  {
+    "lvl": 19,
+    "chapter": 1,
+    "city": "Madrid",
+    "file": "L1_Madrid.png"
+  },
+  {
+    "lvl": 20,
+    "chapter": 1,
+    "city": "Kyoto",
+    "file": "L1_Kyoto.png"
+  },
+  {
+    "lvl": 36,
+    "chapter": 2,
+    "city": "Bangkok",
+    "file": "L2_Bangkok.png"
+  },
+  {
+    "lvl": 37,
+    "chapter": 2,
+    "city": "Kuala Lumpur",
+    "file": "L2_Kuala Lumpur.png"
+  },
+  {
+    "lvl": 38,
+    "chapter": 2,
+    "city": "Manila",
+    "file": "L2_Manila.png"
+  },
+  {
+    "lvl": 39,
+    "chapter": 2,
+    "city": "Taipei",
+    "file": "L2_Taipei.png"
+  },
+  {
+    "lvl": 40,
+    "chapter": 2,
+    "city": "Hong Kong",
+    "file": "L2_Hongkong.png"
+  },
+  {
+    "lvl": 42,
+    "chapter": 3,
+    "city": "Venice",
+    "file": "L3_Venice.png"
+  },
+  {
+    "lvl": 43,
+    "chapter": 3,
+    "city": "Berlin",
+    "file": "L3_Berlin.png"
+  },
+  {
+    "lvl": 44,
+    "chapter": 3,
+    "city": "London",
+    "file": "L3_London.png"
+  },
+  {
+    "lvl": 45,
+    "chapter": 3,
+    "city": "Paris",
+    "file": "L3_Paris.png"
+  },
+  {
+    "lvl": 46,
+    "chapter": 3,
+    "city": "Athens",
+    "file": "L3_Athens.png"
+  },
+  {
+    "lvl": 47,
+    "chapter": 3,
+    "city": "Prague",
+    "file": "L3_Prague.png"
+  },
+  {
+    "lvl": 48,
+    "chapter": 3,
+    "city": "Vienna",
+    "file": "L3_Vienna.png"
+  },
+  {
+    "lvl": 49,
+    "chapter": 3,
+    "city": "San Francisco",
+    "file": "L3_San Francisco.png"
+  },
+  {
+    "lvl": 50,
+    "chapter": 3,
+    "city": "New York City",
+    "file": "L3_NYC.png"
+  },
+  {
+    "lvl": 51,
+    "chapter": 3,
+    "city": "Las Vegas",
+    "file": "L3_Las Vegas.png"
+  },
+  {
+    "lvl": 52,
+    "chapter": 3,
+    "city": "Miami Beach",
+    "file": "L3_Miami.png"
+  },
+  {
+    "lvl": 53,
+    "chapter": 3,
+    "city": "Seattle",
+    "file": "L3_Seattle.png"
+  },
+  {
+    "lvl": 54,
+    "chapter": 3,
+    "city": "New Orleans",
+    "file": "L3_New Orleans.png"
+  },
+  {
+    "lvl": 55,
+    "chapter": 3,
+    "city": "Toronto",
+    "file": "L3_Toronto.png"
+  },
+  {
+    "lvl": 56,
+    "chapter": 3,
+    "city": "Rio de Janeiro",
+    "file": "L3_Rio.png"
+  },
+  {
+    "lvl": 57,
+    "chapter": 3,
+    "city": "Buenos Aires",
+    "file": "L3_Buenos Aires.png"
+  },
+  {
+    "lvl": 58,
+    "chapter": 3,
+    "city": "Mexico City",
+    "file": "L3_Mexico.png"
+  },
+  {
+    "lvl": 59,
+    "chapter": 3,
+    "city": "Santiago",
+    "file": "L3_santiago.png"
+  },
+  {
+    "lvl": 60,
+    "chapter": 3,
+    "city": "Cusco",
+    "file": "L3_Cusco.png"
+  },
+  {
+    "lvl": 71,
+    "chapter": 4,
+    "city": "Seoul",
+    "file": "L4_Seoul.png"
+  },
+  {
+    "lvl": 72,
+    "chapter": 4,
+    "city": "Osaka",
+    "file": "L4_Osaka.png"
+  },
+  {
+    "lvl": 73,
+    "chapter": 4,
+    "city": "Busan",
+    "file": "L4_Busan.png"
+  },
+  {
+    "lvl": 74,
+    "chapter": 4,
+    "city": "Dubai",
+    "file": "L4_Dubai.png"
+  },
+  {
+    "lvl": 75,
+    "chapter": 4,
+    "city": "Petra",
+    "file": "L4_Petra.png"
+  },
+  {
+    "lvl": 76,
+    "chapter": 4,
+    "city": "Istanbul",
+    "file": "L4_Istanbul.png"
+  },
+  {
+    "lvl": 77,
+    "chapter": 4,
+    "city": "Giza / Cairo",
+    "file": "L4_Cairo.png"
+  },
+  {
+    "lvl": 78,
+    "chapter": 4,
+    "city": "Cape Town",
+    "file": "L4_Cape Town.png"
+  },
+  {
+    "lvl": 79,
+    "chapter": 4,
+    "city": "Nairobi",
+    "file": "L4_Nairobi.png"
+  },
+  {
+    "lvl": 80,
+    "chapter": 4,
+    "city": "Auckland",
+    "file": "L4_Auckland.png"
+  },
+  {
+    "lvl": 81,
+    "chapter": 5,
+    "city": "Tokyo",
+    "file": "L5_Tokyo.png"
+  },
+  {
+    "lvl": 83,
+    "chapter": 5,
+    "city": "London",
+    "file": "L5_London.png"
+  },
+  {
+    "lvl": 84,
+    "chapter": 5,
+    "city": "Paris",
+    "file": "L5_Paris.png"
+  },
+  {
+    "lvl": 85,
+    "chapter": 5,
+    "city": "New York City",
+    "file": "L5_NYC.png"
+  },
+  {
+    "lvl": 86,
+    "chapter": 5,
+    "city": "Kyoto",
+    "file": "L5_Kyoto.png"
+  },
+  {
+    "lvl": 90,
+    "chapter": 5,
+    "city": "Rio de Janeiro",
+    "file": "L5_Rio de Janeiro.png"
+  },
+  {
+    "lvl": 91,
+    "chapter": 5,
+    "city": "Dubai",
+    "file": "L5_Dubai.png"
+  },
+  {
+    "lvl": 92,
+    "chapter": 5,
+    "city": "San Francisco",
+    "file": "L5_San Francisco.png"
+  },
+  {
+    "lvl": 93,
+    "chapter": 5,
+    "city": "Rome",
+    "file": "L5_Rome.png"
+  },
+  {
+    "lvl": 95,
+    "chapter": 5,
+    "city": "Sydney",
+    "file": "L5_Sydney.png"
+  },
+  {
+    "lvl": 96,
+    "chapter": 5,
+    "city": "Berlin",
+    "file": "L5_Berlin.png"
+  },
+  {
+    "lvl": 97,
+    "chapter": 5,
+    "city": "Singapore",
+    "file": "L5_Singapore.png"
+  },
+  {
+    "lvl": 98,
+    "chapter": 5,
+    "city": "Santa Monica",
+    "file": "L5_Santa Monica.png"
+  },
+  {
+    "lvl": 100,
+    "chapter": 5,
+    "city": "Mountain View, California",
+    "file": "L5_Mountain View.png"
+  }
+]

@@ -1,0 +1,298 @@
+[
+  {
+    "lvl": 9,
+    "chapter": 1,
+    "city": "Dublin",
+    "country": "Irlandia",
+    "targetYear": 2009,
+    "expectedFilename": "L1_Dublin.png"
+  },
+  {
+    "lvl": 11,
+    "chapter": 1,
+    "city": "Lisbon",
+    "country": "Portugal",
+    "targetYear": 2009,
+    "expectedFilename": "L1_Lisbon.png"
+  },
+  {
+    "lvl": 13,
+    "chapter": 1,
+    "city": "Stockholm",
+    "country": "Swedia",
+    "targetYear": 2009,
+    "expectedFilename": "L1_Stockholm.png"
+  },
+  {
+    "lvl": 15,
+    "chapter": 1,
+    "city": "Honolulu",
+    "country": "Amerika Serikat",
+    "targetYear": 2008,
+    "expectedFilename": "L1_Honolulu.png"
+  },
+  {
+    "lvl": 18,
+    "chapter": 1,
+    "city": "Brussels",
+    "country": "Belgia",
+    "targetYear": 2009,
+    "expectedFilename": "L1_Brussels.png"
+  },
+  {
+    "lvl": 21,
+    "chapter": 2,
+    "city": "Milan",
+    "country": "Italia",
+    "targetYear": 2008,
+    "expectedFilename": "L2_Milan.png"
+  },
+  {
+    "lvl": 22,
+    "chapter": 2,
+    "city": "Zurich",
+    "country": "Swiss",
+    "targetYear": 2009,
+    "expectedFilename": "L2_Zurich.png"
+  },
+  {
+    "lvl": 23,
+    "chapter": 2,
+    "city": "Munich",
+    "country": "Jerman",
+    "targetYear": 2010,
+    "expectedFilename": "L2_Munich.png"
+  },
+  {
+    "lvl": 24,
+    "chapter": 2,
+    "city": "Oslo",
+    "country": "Norwegia",
+    "targetYear": 2010,
+    "expectedFilename": "L2_Oslo.png"
+  },
+  {
+    "lvl": 25,
+    "chapter": 2,
+    "city": "Helsinki",
+    "country": "Finlandia",
+    "targetYear": 2010,
+    "expectedFilename": "L2_Helsinki.png"
+  },
+  {
+    "lvl": 26,
+    "chapter": 2,
+    "city": "Kopenhagen",
+    "country": "Denmark",
+    "targetYear": 2010,
+    "expectedFilename": "L2_Kopenhagen.png"
+  },
+  {
+    "lvl": 27,
+    "chapter": 2,
+    "city": "Warsawa",
+    "country": "Polandia",
+    "targetYear": 2011,
+    "expectedFilename": "L2_Warsawa.png"
+  },
+  {
+    "lvl": 28,
+    "chapter": 2,
+    "city": "Budapest",
+    "country": "Hungaria",
+    "targetYear": 2011,
+    "expectedFilename": "L2_Budapest.png"
+  },
+  {
+    "lvl": 29,
+    "chapter": 2,
+    "city": "Reykjavik",
+    "country": "Islandia",
+    "targetYear": 2013,
+    "expectedFilename": "L2_Reykjavik.png"
+  },
+  {
+    "lvl": 30,
+    "chapter": 2,
+    "city": "Montreal",
+    "country": "Kanada",
+    "targetYear": 2009,
+    "expectedFilename": "L2_Montreal.png"
+  },
+  {
+    "lvl": 31,
+    "chapter": 2,
+    "city": "Vancouver",
+    "country": "Kanada",
+    "targetYear": 2009,
+    "expectedFilename": "L2_Vancouver.png"
+  },
+  {
+    "lvl": 32,
+    "chapter": 2,
+    "city": "Washington D.C.",
+    "country": "Amerika Serikat",
+    "targetYear": 2008,
+    "expectedFilename": "L2_Washington D.C..png"
+  },
+  {
+    "lvl": 33,
+    "chapter": 2,
+    "city": "Boston",
+    "country": "Amerika Serikat",
+    "targetYear": 2008,
+    "expectedFilename": "L2_Boston.png"
+  },
+  {
+    "lvl": 34,
+    "chapter": 2,
+    "city": "Melbourne",
+    "country": "Australia",
+    "targetYear": 2010,
+    "expectedFilename": "L2_Melbourne.png"
+  },
+  {
+    "lvl": 35,
+    "chapter": 2,
+    "city": "Edinburgh",
+    "country": "Skotlandia",
+    "targetYear": 2009,
+    "expectedFilename": "L2_Edinburgh.png"
+  },
+  {
+    "lvl": 41,
+    "chapter": 3,
+    "city": "Barcelona",
+    "country": "Spanyol",
+    "targetYear": 2011,
+    "expectedFilename": "L3_Barcelona.png"
+  },
+  {
+    "lvl": 61,
+    "chapter": 4,
+    "city": "Nara",
+    "country": "Jepang",
+    "targetYear": 2010,
+    "expectedFilename": "L4_Nara.png"
+  },
+  {
+    "lvl": 62,
+    "chapter": 4,
+    "city": "Sapporo",
+    "country": "Jepang",
+    "targetYear": 2011,
+    "expectedFilename": "L4_Sapporo.png"
+  },
+  {
+    "lvl": 63,
+    "chapter": 4,
+    "city": "Incheon",
+    "country": "Korea Selatan",
+    "targetYear": 2012,
+    "expectedFilename": "L4_Incheon.png"
+  },
+  {
+    "lvl": 64,
+    "chapter": 4,
+    "city": "Doha",
+    "country": "Qatar",
+    "targetYear": 2014,
+    "expectedFilename": "L4_Doha.png"
+  },
+  {
+    "lvl": 65,
+    "chapter": 4,
+    "city": "Abu Dhabi",
+    "country": "Uni Emirat Arab",
+    "targetYear": 2014,
+    "expectedFilename": "L4_Abu Dhabi.png"
+  },
+  {
+    "lvl": 66,
+    "chapter": 4,
+    "city": "Muscat",
+    "country": "Oman",
+    "targetYear": 2015,
+    "expectedFilename": "L4_Muscat.png"
+  },
+  {
+    "lvl": 67,
+    "chapter": 4,
+    "city": "Marrakech",
+    "country": "Maroko",
+    "targetYear": 2015,
+    "expectedFilename": "L4_Marrakech.png"
+  },
+  {
+    "lvl": 68,
+    "chapter": 4,
+    "city": "Casablanca",
+    "country": "Maroko",
+    "targetYear": 2015,
+    "expectedFilename": "L4_Casablanca.png"
+  },
+  {
+    "lvl": 69,
+    "chapter": 4,
+    "city": "Brisbane",
+    "country": "Australia",
+    "targetYear": 2010,
+    "expectedFilename": "L4_Brisbane.png"
+  },
+  {
+    "lvl": 70,
+    "chapter": 4,
+    "city": "Kyoto",
+    "country": "Jepang",
+    "targetYear": 2012,
+    "expectedFilename": "L4_Kyoto.png"
+  },
+  {
+    "lvl": 82,
+    "chapter": 5,
+    "city": "Beijing",
+    "country": "Tiongkok",
+    "targetYear": 2011,
+    "expectedFilename": "L5_Beijing.png"
+  },
+  {
+    "lvl": 87,
+    "chapter": 5,
+    "city": "Frankfurt",
+    "country": "Jerman",
+    "targetYear": 2008,
+    "expectedFilename": "L5_Frankfurt.png"
+  },
+  {
+    "lvl": 88,
+    "chapter": 5,
+    "city": "Sao Paulo",
+    "country": "Brasil",
+    "targetYear": 2012,
+    "expectedFilename": "L5_Sao Paulo.png"
+  },
+  {
+    "lvl": 89,
+    "chapter": 5,
+    "city": "Bogota",
+    "country": "Kolombia",
+    "targetYear": 2013,
+    "expectedFilename": "L5_Bogota.png"
+  },
+  {
+    "lvl": 94,
+    "chapter": 5,
+    "city": "Rotterdam",
+    "country": "Belanda",
+    "targetYear": 2009,
+    "expectedFilename": "L5_Rotterdam.png"
+  },
+  {
+    "lvl": 99,
+    "chapter": 5,
+    "city": "Geneva",
+    "country": "Swiss",
+    "targetYear": 2009,
+    "expectedFilename": "L5_Geneva.png"
+  }
+]

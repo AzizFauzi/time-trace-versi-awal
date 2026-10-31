@@ -1,0 +1,6 @@
+{
+  "name": "Time Trace",
+  "description": "Time Trace - Chronological mystery and geographic exploration game where players guess the exact location and archival year of historical Google Street View captures.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

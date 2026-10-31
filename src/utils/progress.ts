@@ -290,11 +290,11 @@ export function getPlayerRank(totalStars: number, lang: Language): PlayerRank {
 }
 
 const CHANCES_STORAGE_KEY = 'street_view_time_traveler_chances_v2';
-export const MAX_DAILY_CHANCES = 3;
+export const MAX_DAILY_CHANCES = 5;
 
 export interface DailyChances {
-  remaining: number; // 0 to 3
-  maxChances: number; // 3
+  remaining: number; // 0 to 5
+  maxChances: number; // 5
   lastDate: string; // YYYY-MM-DD
 }
 

@@ -63,6 +63,7 @@ interface HomeDashboardProps {
   onOpenPassport: (defaultTab?: 'history' | 'stats' | 'achievements' | 'shop') => void;
   onOpenHowToPlay: () => void;
   onOpenClaimGelar?: () => void;
+  onOpenWaitlist?: () => void;
 }
 
 /**
@@ -171,6 +172,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   onOpenPassport,
   onOpenHowToPlay,
   onOpenClaimGelar,
+  onOpenWaitlist,
 }) => {
   const isEn = lang === 'en';
   const t = TRANSLATIONS[lang];
@@ -406,13 +408,28 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Hearts / Chances */}
           <div
-            onClick={onOpenLevelSelector}
+            onClick={dailyChances.remaining <= 0 ? onOpenWaitlist : onOpenLevelSelector}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs font-mono font-bold shadow-sm cursor-pointer hover:border-rose-400/60 transition"
-            title={isEn ? 'Daily Lives' : 'Kesempatan Harian'}
+            title={isEn ? 'Daily Cases Remaining (Click for Unlimited VIP)' : 'Sisa Kasus Harian (Klik untuk VIP Tanpa Batas)'}
           >
             <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
-            <span>{dailyChances.remaining}/{dailyChances.maxChances || 3}</span>
+            <span>{dailyChances.remaining}/{dailyChances.maxChances || 5}</span>
           </div>
+
+          {/* VIP Pass Coming Soon Button */}
+          {onOpenWaitlist && (
+            <button
+              onClick={onOpenWaitlist}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-500/30 to-amber-500/20 hover:from-amber-500/35 hover:to-yellow-500/40 border border-amber-400/80 text-amber-300 text-xs font-mono font-bold shadow-md shadow-amber-950/40 cursor-pointer transition active:scale-95"
+              title={isEn ? 'VIP Unlimited Access (Coming Soon)' : 'Akses VIP Tanpa Batas (Segera Hadir)'}
+            >
+              <Crown className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden sm:inline">VIP Pass</span>
+              <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-500/30 text-amber-200 border border-amber-400/50">
+                Coming Soon
+              </span>
+            </button>
+          )}
 
           {/* Coins */}
           <div

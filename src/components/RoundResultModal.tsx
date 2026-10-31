@@ -25,6 +25,7 @@ import {
   FileText,
   Gem,
   Glasses,
+  Crown,
 } from 'lucide-react';
 import { Language, TRANSLATIONS } from '../utils/i18n';
 
@@ -58,6 +59,7 @@ interface RoundResultModalProps {
   newAchievements?: Achievement[];
   grade?: 'S' | 'A' | 'B' | 'C' | 'D';
   onOpenPassport?: () => void;
+  onOpenWaitlist?: () => void;
 }
 
 export const RoundResultModal: React.FC<RoundResultModalProps> = ({
@@ -81,13 +83,14 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
   onOpenLevelSelect,
   onRetryLevel,
   chancesRemaining,
-  maxChances = 3,
+  maxChances = 5,
   lostLifeThisRound = false,
   timeUntilTomorrow = '00:00:00',
   coinsEarned = 0,
   newAchievements = [],
   grade: explicitGrade,
   onOpenPassport,
+  onOpenWaitlist,
 }) => {
   const t = TRANSLATIONS[lang];
   const roundTotalScore = locationScore + yearScore;
@@ -661,12 +664,22 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
           {/* Next Level / Retry / Restart Primary Action */}
           {gameMode === 'campaign' ? (
             !isLevelPassed ? (
-              <button
-                onClick={onRestart}
-                className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition active:scale-98 flex items-center justify-center gap-2 cursor-pointer text-xs sm:text-sm shadow-md"
-              >
-                <span>{lang === 'en' ? 'Back to Menu' : 'Kembali ke Menu'}</span>
-              </button>
+              chancesRemaining !== undefined && chancesRemaining <= 0 && onOpenWaitlist ? (
+                <button
+                  onClick={onOpenWaitlist}
+                  className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl font-bold bg-gradient-to-r from-amber-500/30 via-yellow-500/40 to-amber-500/30 hover:from-amber-500/40 hover:to-yellow-500/50 text-amber-200 border border-amber-400/80 transition active:scale-98 flex items-center justify-center gap-2 cursor-pointer text-xs sm:text-sm shadow-lg shadow-amber-950/60"
+                >
+                  <Crown className="w-4 h-4 text-amber-400" />
+                  <span>{lang === 'en' ? 'Out of Lives • Get VIP Pass 👑' : 'Kuota Habis • Buka Akses VIP 👑'}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={onRestart}
+                  className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition active:scale-98 flex items-center justify-center gap-2 cursor-pointer text-xs sm:text-sm shadow-md"
+                >
+                  <span>{lang === 'en' ? 'Back to Menu' : 'Kembali ke Menu'}</span>
+                </button>
+              )
             ) : levelNumber === 100 ? (
               <button
                 onClick={onNextRound}
@@ -687,12 +700,22 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
             )
           ) : gameMode === 'indonesia' ? (
             !isLevelPassed ? (
-              <button
-                onClick={onRestart}
-                className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition active:scale-98 flex items-center justify-center gap-2 cursor-pointer text-xs sm:text-sm shadow-md"
-              >
-                <span>{lang === 'en' ? 'Back to Menu' : 'Kembali ke Menu'}</span>
-              </button>
+              chancesRemaining !== undefined && chancesRemaining <= 0 && onOpenWaitlist ? (
+                <button
+                  onClick={onOpenWaitlist}
+                  className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl font-bold bg-gradient-to-r from-amber-500/30 via-yellow-500/40 to-amber-500/30 hover:from-amber-500/40 hover:to-yellow-500/50 text-amber-200 border border-amber-400/80 transition active:scale-98 flex items-center justify-center gap-2 cursor-pointer text-xs sm:text-sm shadow-lg shadow-amber-950/60"
+                >
+                  <Crown className="w-4 h-4 text-amber-400" />
+                  <span>{lang === 'en' ? 'Out of Lives • Get VIP Pass 👑' : 'Kuota Habis • Buka Akses VIP 👑'}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={onRestart}
+                  className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition active:scale-98 flex items-center justify-center gap-2 cursor-pointer text-xs sm:text-sm shadow-md"
+                >
+                  <span>{lang === 'en' ? 'Back to Menu' : 'Kembali ke Menu'}</span>
+                </button>
+              )
             ) : levelNumber === 50 ? (
               <button
                 onClick={onRestart}

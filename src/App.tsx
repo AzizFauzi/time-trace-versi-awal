@@ -9,9 +9,7 @@ import {
 } from './data/challenges';
 import { calculateHaversineDistanceKm, calculateLocationScore, calculateYearScore, MINIMUM_PASS_SCORE } from './utils/scoring';
 import { StreetViewViewer } from './components/StreetViewViewer';
-import { WebGLPanoramaViewer } from './components/WebGLPanoramaViewer';
 import { GuessMap } from './components/GuessMap';
-import { LeafletGuessMap } from './components/LeafletGuessMap';
 import { YearPickerTimeline } from './components/YearPickerTimeline';
 import { ChronoGearPanel } from './components/ChronoGearPanel';
 import { RoundResultModal } from './components/RoundResultModal';
@@ -20,6 +18,7 @@ import { IndonesiaCaseSelectorModal } from './components/IndonesiaCaseSelectorMo
 import { HistoryAndPassportModal } from './components/HistoryAndPassportModal';
 import { HowToPlayModal } from './components/HowToPlayModal';
 import { GrandVictoryCelebrationModal } from './components/GrandVictoryCelebrationModal';
+import { PremiumWaitlistModal } from './components/PremiumWaitlistModal';
 import { AppBackground } from './components/AppBackground';
 import { HomeDashboard } from './components/HomeDashboard';
 import logoImg from './assets/logo.png';
@@ -101,12 +100,7 @@ const DEFAULT_TOTAL_ROUNDS = 5;
 export default function App() {
   const [mapsLoaded, setMapsLoaded] = useState<boolean>(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-
-  // Engine Mode: 'webgl' (100% Free Open-Source Rp 0, Default) or 'google' (Google Maps & Street View API)
-  const [engineMode, setEngineMode] = useState<'webgl' | 'google'>(() => {
-    const saved = localStorage.getItem('time_trace_engine');
-    return saved === 'google' ? 'google' : 'webgl';
-  });
+  const [isPremiumWaitlistOpen, setIsPremiumWaitlistOpen] = useState<boolean>(false);
 
   // Localization & Region State
   const [lang, setLang] = useState<Language>(() => {
@@ -265,9 +259,10 @@ export default function App() {
       playerProgress.levels[levelNumber] && playerProgress.levels[levelNumber].score >= MINIMUM_PASS_SCORE
     );
 
-    // If level is uncleared and no daily chances left, block and warn
+    // If level is uncleared and no daily chances left, block and open VIP subscription modal
     if (!isAlreadyPassed && dailyChances.remaining <= 0) {
-      openLevelModal();
+      soundManager.playModalOpen();
+      setIsPremiumWaitlistOpen(true);
       return;
     }
 
@@ -289,11 +284,8 @@ export default function App() {
   // Start daily mystery challenge
   const startDailyChallenge = () => {
     if (dailyChances.remaining <= 0) {
-      showChronoToast(
-        lang === 'en'
-          ? `0/${dailyChances.maxChances || MAX_DAILY_CHANCES} Lives! Reset tomorrow in ${timeUntilTomorrow}`
-          : `0/${dailyChances.maxChances || MAX_DAILY_CHANCES} Kesempatan habis! Tunggu besok (Reset: ${timeUntilTomorrow})`
-      );
+      soundManager.playModalOpen();
+      setIsPremiumWaitlistOpen(true);
       return;
     }
     const dailyLevel = getDailyChallengeId(100);
@@ -315,11 +307,8 @@ export default function App() {
   // Start quick expedition (5 rounds) by region
   const startQuickExpedition = (regionToUse: RegionId = selectedRegion) => {
     if (dailyChances.remaining <= 0) {
-      showChronoToast(
-        lang === 'en'
-          ? `0/${dailyChances.maxChances || MAX_DAILY_CHANCES} Lives! Reset tomorrow in ${timeUntilTomorrow}`
-          : `0/${dailyChances.maxChances || MAX_DAILY_CHANCES} Kesempatan habis! Tunggu besok (Reset: ${timeUntilTomorrow})`
-      );
+      soundManager.playModalOpen();
+      setIsPremiumWaitlistOpen(true);
       return;
     }
     setSelectedRegion(regionToUse);
@@ -344,11 +333,8 @@ export default function App() {
   // Start Indonesia heritage campaign (50 sequential cases)
   const startIndonesiaCampaign = (caseNumber: number = 1) => {
     if (dailyChances.remaining <= 0) {
-      showChronoToast(
-        lang === 'en'
-          ? `0/${dailyChances.maxChances || MAX_DAILY_CHANCES} Lives! Reset tomorrow in ${timeUntilTomorrow}`
-          : `0/${dailyChances.maxChances || MAX_DAILY_CHANCES} Kesempatan habis! Tunggu besok (Reset: ${timeUntilTomorrow})`
-      );
+      soundManager.playModalOpen();
+      setIsPremiumWaitlistOpen(true);
       return;
     }
     const safeCase = Math.max(1, Math.min(50, caseNumber));
@@ -721,6 +707,10 @@ export default function App() {
           onOpenPassport={(tab) => openPassportModal(tab || 'shop')}
           onOpenHowToPlay={openHowToPlayModal}
           onOpenClaimGelar={() => setShowGrandVictoryModal(true)}
+          onOpenWaitlist={() => {
+            soundManager.playModalOpen();
+            setIsPremiumWaitlistOpen(true);
+          }}
         />
 
         {/* Global Modals Accessible From Dashboard */}
@@ -768,6 +758,13 @@ export default function App() {
             onOpenLevelSelector={openLevelModal}
           />
         )}
+
+        {/* Premium VIP Pass Coming Soon Modal */}
+        <PremiumWaitlistModal
+          isOpen={isPremiumWaitlistOpen}
+          onClose={() => setIsPremiumWaitlistOpen(false)}
+          lang={lang}
+        />
       </div>
     );
   }
@@ -1014,36 +1011,19 @@ export default function App() {
             <span className="hidden md:inline">{lang === 'en' ? 'How to Play' : 'Cara Bermain'}</span>
           </button>
 
-          {/* Engine Mode Toggle (WebGL 360° Rp 0 vs Google Maps Live API) */}
+          {/* VIP Pass / Langganan (Coming Soon) */}
           <button
             onClick={() => {
-              const next = engineMode === 'webgl' ? 'google' : 'webgl';
-              setEngineMode(next);
-              localStorage.setItem('time_trace_engine', next);
-              soundManager.playTick();
-              showChronoToast(
-                next === 'webgl'
-                  ? (lang === 'en' ? '✨ Switched to 360° WebGL + OSM (Rp 0 Free Selamanya)' : '✨ Beralih ke Mesin 360° WebGL + OSM (Rp 0 Bebas Kuota)')
-                  : (lang === 'en' ? '🌐 Switched to Google Maps Live API' : '🌐 Beralih ke Google Maps Live API')
-              );
+              soundManager.playModalOpen();
+              setIsPremiumWaitlistOpen(true);
             }}
-            className={`px-2.5 py-1.5 rounded-xl border text-xs font-mono font-bold shadow-md transition cursor-pointer flex items-center gap-1.5 ${
-              engineMode === 'webgl'
-                ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-300 hover:bg-emerald-900/80 shadow-emerald-950/50'
-                : 'bg-blue-950/80 border-blue-500/50 text-blue-300 hover:bg-blue-900/80 shadow-blue-950/50'
-            }`}
-            title={
-              engineMode === 'webgl'
-                ? (lang === 'en' ? 'Current: 360° WebGL + OpenStreetMap (100% Free Rp 0). Click to switch to Google API.' : 'Mesin Aktif: 360° WebGL + OpenStreetMap (100% Gratis Rp 0). Klik untuk beralih ke Google API.')
-                : (lang === 'en' ? 'Current: Google Maps API. Click to switch to WebGL Rp 0.' : 'Mesin Aktif: Google Maps API. Klik untuk beralih ke WebGL Rp 0.')
-            }
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-500/30 to-amber-500/20 hover:from-amber-500/35 hover:to-yellow-500/40 border border-amber-400/80 text-xs font-bold text-amber-300 shadow-md shadow-amber-950/40 transition cursor-pointer active:scale-95"
+            title={lang === 'en' ? 'Unlimited Cases & Ad-Free (Coming Soon)' : 'Akses Tanpa Batas & Bebas Iklan (Segera Hadir)'}
           >
-            <Sparkles className={`w-3.5 h-3.5 ${engineMode === 'webgl' ? 'text-emerald-400' : 'text-blue-400'}`} />
-            <span className="hidden sm:inline">
-              {engineMode === 'webgl' ? 'WebGL 360°' : 'Google API'}
-            </span>
-            <span className="px-1.5 py-0.2 rounded text-[10px] font-sans font-bold bg-black/40">
-              {engineMode === 'webgl' ? 'Rp 0' : 'API'}
+            <Crown className="w-3.5 h-3.5 text-amber-400" />
+            <span className="font-mono hidden sm:inline">VIP Pass</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/30 text-amber-200 border border-amber-400/50 font-mono font-semibold">
+              Coming Soon
             </span>
           </button>
 
@@ -1114,29 +1094,18 @@ export default function App() {
         <AppBackground />
 
         {/* IN-GAME ACTIVE VIEW */}
-        {gameStarted && currentChallenge && (mapsLoaded || engineMode === 'webgl') && (
+        {gameStarted && currentChallenge && mapsLoaded && (
           <div className="relative w-full h-full">
-            {/* Fullscreen 360 Viewer (WebGL Rp 0 or Google Street View) */}
+            {/* Google Street View Fullscreen 360 Viewer */}
             <div className="absolute inset-0">
-              {engineMode === 'webgl' ? (
-                <WebGLPanoramaViewer
-                  key={currentChallenge.id}
-                  challenge={currentChallenge}
-                  apiKey={API_KEY}
-                  isInspecting={!roundConfirmed}
-                  lang={lang}
-                  activeFilter={gamification.activeFilter}
-                />
-              ) : (
-                <StreetViewViewer
-                  key={currentChallenge.id}
-                  challenge={currentChallenge}
-                  apiKey={API_KEY}
-                  isInspecting={!roundConfirmed}
-                  lang={lang}
-                  activeFilter={gamification.activeFilter}
-                />
-              )}
+              <StreetViewViewer
+                key={currentChallenge.id}
+                challenge={currentChallenge}
+                apiKey={API_KEY}
+                isInspecting={!roundConfirmed}
+                lang={lang}
+                activeFilter={gamification.activeFilter}
+              />
             </div>
 
             {/* Bottom-Left Floating Panel: Forensic Clues & Chrono Equipment */}
@@ -1340,28 +1309,16 @@ export default function App() {
                 />
               </div>
 
-              {/* Mini Map for Guessing Location (Leaflet Rp 0 or Google Maps) */}
-              {engineMode === 'webgl' ? (
-                <LeafletGuessMap
-                  onLocationSelected={setSelectedLocation}
-                  selectedLocation={selectedLocation}
-                  confirmed={roundConfirmed}
-                  actualLocation={currentChallenge.realLocation}
-                  lang={lang}
-                  region={gameMode === 'campaign' || gameMode === 'daily' ? 'global' : gameMode === 'indonesia' ? 'indonesia' : selectedRegion}
-                  theme={gamification.activeTheme}
-                />
-              ) : (
-                <GuessMap
-                  onLocationSelected={setSelectedLocation}
-                  selectedLocation={selectedLocation}
-                  confirmed={roundConfirmed}
-                  actualLocation={currentChallenge.realLocation}
-                  lang={lang}
-                  region={gameMode === 'campaign' || gameMode === 'daily' ? 'global' : gameMode === 'indonesia' ? 'indonesia' : selectedRegion}
-                  theme={gamification.activeTheme}
-                />
-              )}
+              {/* Mini Map for Guessing Location */}
+              <GuessMap
+                onLocationSelected={setSelectedLocation}
+                selectedLocation={selectedLocation}
+                confirmed={roundConfirmed}
+                actualLocation={currentChallenge.realLocation}
+                lang={lang}
+                region={gameMode === 'campaign' || gameMode === 'daily' ? 'global' : gameMode === 'indonesia' ? 'indonesia' : selectedRegion}
+                theme={gamification.activeTheme}
+              />
 
               {/* Submit Guess Action Button */}
               {!roundConfirmed && (
@@ -1422,6 +1379,7 @@ export default function App() {
                 newAchievements={lastNewAchievements}
                 grade={lastRoundGrade}
                 onOpenPassport={() => openPassportModal('shop')}
+                onOpenWaitlist={() => setIsPremiumWaitlistOpen(true)}
               />
             )}
           </div>
@@ -1486,6 +1444,13 @@ export default function App() {
             onOpenLevelSelector={openLevelModal}
           />
         )}
+
+        {/* Premium VIP Pass Coming Soon Modal */}
+        <PremiumWaitlistModal
+          isOpen={isPremiumWaitlistOpen}
+          onClose={() => setIsPremiumWaitlistOpen(false)}
+          lang={lang}
+        />
       </main>
     </div>
   );

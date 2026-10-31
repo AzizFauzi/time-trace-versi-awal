@@ -1,1 +1,1 @@
-feat: implement 100% free open-source WebGL 360 panorama and Leaflet OpenStreetMap engine with instant engine toggle
+feat: restore pure Google Street View & Google Maps engine with 5 daily cases restriction and VIP Pass Coming Soon modal

@@ -8,7 +8,7 @@ import {
   getChallengeByLevel,
 } from './data/challenges';
 import { calculateHaversineDistanceKm, calculateLocationScore, calculateYearScore, MINIMUM_PASS_SCORE } from './utils/scoring';
-import { StreetViewViewer } from './components/StreetViewViewer';
+import { SimpleStreetView } from './components/SimpleStreetView';
 import { LeafletGuessMap as GuessMap } from './components/LeafletGuessMap';
 import { YearPickerTimeline } from './components/YearPickerTimeline';
 import { ChronoGearPanel } from './components/ChronoGearPanel';
@@ -1093,7 +1093,7 @@ export default function App() {
           <div className="relative w-full h-full">
             {/* Google Street View Fullscreen 360 Viewer */}
             <div className="absolute inset-0">
-              <StreetViewViewer
+              <SimpleStreetView
                 key={currentChallenge.id}
                 challenge={currentChallenge}
                 apiKey={API_KEY}

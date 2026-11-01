@@ -58,27 +58,27 @@ export const IndonesiaCaseSelectorModal: React.FC<IndonesiaCaseSelectorModalProp
     {
       id: "Wilayah 1: Jantung Jawa & Bali (Kasus 1-10)",
       en: "Region 1: Heart of Java & Bali (Cases 1-10)",
-      subtitle: "Jakarta, Malioboro, Gedung Sate, Surabaya, Kuta & Borobudur"
+      subtitle: isEn ? "Heritage & classic historical archives (Cases 1-10)" : "Arsip sejarah pusaka & cagar budaya (Kasus 1-10)"
     },
     {
-      id: "Wilayah 2: Mataram, Sunda Kecil & Sumatera (Kasus 11-20)",
+      id: "Wilayah 2: Nusa Tenggara & Sumatera (Kasus 11-20)",
       en: "Region 2: Lesser Sunda & Sumatra (Cases 11-20)",
-      subtitle: "Solo, Malang, Tanah Lot, Senggigi, Jam Gadang, Ampera & Danau Toba"
+      subtitle: isEn ? "Historic trails & ancient kingdoms (Cases 11-20)" : "Jalur sejarah pusaka keraton & pesisir (Kasus 11-20)"
     },
     {
-      id: "Wilayah 3: Kalimantan, Sulawesi & Indonesia Timur (Kasus 21-30)",
-      en: "Region 3: Borneo, Celebes & East RI (Cases 21-30)",
-      subtitle: "Mahakam, Melawai, Equator, Losari, Toraja, Ambon, Youtefa & Sabang"
+      id: "Wilayah 3: Gerbang Barat & Jalur Kepulauan (Kasus 21-30)",
+      en: "Region 3: Western Frontiers & Island Trails (Cases 21-30)",
+      subtitle: isEn ? "Maritime waterways & frontier trails (Cases 21-30)" : "Jalur perairan maritim & tapal batas barat (Kasus 21-30)"
     },
     {
-      id: "Wilayah 4: Pusaka Sejarah & Jalur Kolonial (Kasus 31-40)",
-      en: "Region 4: Colonial Heritage & Great Trails (Cases 31-40)",
-      subtitle: "GBK 2014, Alun-Alun Bandung, Prambanan, Baiturrahman, Kelok 9 & Siger"
+      id: "Wilayah 4: Zamrud Khatulistiwa & Tanah Borneo (Kasus 31-40)",
+      en: "Region 4: Equator & Borneo Expedition (Cases 31-40)",
+      subtitle: isEn ? "Equator rivers, coastal cities & island heritage (Cases 31-40)" : "Sungai purba, pesisir pulau & jalur khatulistiwa (Kasus 31-40)"
     },
     {
-      id: "Wilayah 5: Titik Nol, Gunung Api & Mahakarya Timur (Kasus 41-50)",
-      en: "Region 5: Volcanos, Ancient Shrines & Frontier (Cases 41-50)",
-      subtitle: "Anyer Daendels, Lawang Sewu, Dieng, Bromo, Labuan Bajo & Danau Sentani"
+      id: "Wilayah 5: Sulawesi, Maluku & Mahakarya Timur (Kasus 41-50)",
+      en: "Region 5: Celebes, Maluku & Eastern Wonders (Cases 41-50)",
+      subtitle: isEn ? "Ancient fortresses & eastern frontiers (Cases 41-50)" : "Benteng bersejarah, teluk laut & gerbang timur (Kasus 41-50)"
     },
   ];
 
@@ -247,18 +247,39 @@ export const IndonesiaCaseSelectorModal: React.FC<IndonesiaCaseSelectorModalProp
                     </div>
                   </div>
 
-                  {/* Middle Line: Title & City */}
+                  {/* Middle Line: Title & City - HIDE UNTIL PASSED TO AVOID SPOILERS */}
                   <div className="space-y-1 mb-3">
-                    <h4 className="text-sm sm:text-base font-bold text-white leading-snug line-clamp-1">
-                      {c.title[lang] || c.title.id}
+                    <h4 className="text-sm sm:text-base font-bold leading-snug line-clamp-1">
+                      {isPassed ? (
+                        <span className="text-white">{c.title[lang] || c.title.id}</span>
+                      ) : (
+                        <span className="text-amber-200/90 font-mono">
+                          {isEn ? `Mystery Case #${caseNum}` : `Misteri Kasus #${caseNum}`}
+                        </span>
+                      )}
                     </h4>
-                    <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                      <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                      <span className="truncate">{c.city}, Indonesia</span>
-                      <span className="text-slate-600">•</span>
-                      <span className="text-amber-400 font-mono font-semibold shrink-0">
-                        {c.targetYear}
-                      </span>
+                    <div className="flex items-center gap-1.5 text-xs">
+                      {isPassed ? (
+                        <>
+                          <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                          <span className="text-slate-300 truncate font-semibold">{c.city}, Indonesia</span>
+                          <span className="text-slate-600">•</span>
+                          <span className="text-amber-400 font-mono font-semibold shrink-0">
+                            {c.targetYear}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <MapPin className="w-3.5 h-3.5 text-amber-400/70 shrink-0" />
+                          <span className="text-slate-400 font-mono">
+                            {isEn ? `City #${caseNum}` : `Kota ke-${caseNum}`}
+                          </span>
+                          <span className="text-slate-600">•</span>
+                          <span className="text-slate-500 italic text-[11px]">
+                            {isEn ? 'Classified Location' : 'Lokasi Rahasia'}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -267,7 +288,11 @@ export const IndonesiaCaseSelectorModal: React.FC<IndonesiaCaseSelectorModalProp
                     {isUnlocked ? (
                       <>
                         <span className="text-[11px] text-slate-400 line-clamp-1 italic">
-                          🚗 {c.hints.cars[lang] || c.hints.cars.id}
+                          {isPassed
+                            ? `🚗 ${c.hints.cars[lang] || c.hints.cars.id}`
+                            : isEn
+                            ? '🔍 Guess & pass to reveal city name & clues'
+                            : '🔍 Tebak & lulus untuk membuka nama kota'}
                         </span>
                         <span className="text-xs font-bold text-emerald-400 flex items-center gap-1 shrink-0 ml-2">
                           <Play className="w-3 h-3 fill-emerald-400" />

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { HistoricalPano } from '../data/challenges';
 import { Camera, RefreshCw, ZoomIn, ZoomOut, AlertCircle, History, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { Language, TRANSLATIONS } from '../utils/i18n';
-import { LEVEL_IMAGE_MAP } from '../utils/cityImageHelper';
+import { LEVEL_IMAGE_MAP, INDONESIA_IMAGE_MAP } from '../utils/cityImageHelper';
 
 interface StreetViewViewerProps {
   challenge: HistoricalPano;
@@ -33,6 +33,7 @@ export const StreetViewViewer: React.FC<StreetViewViewerProps> = ({
 
   // High-resolution archival photographic asset if StreetView 3D tiles fail or for manual toggle
   const archivalPhotoUrl =
+    (challenge.id.startsWith('indo-') && challenge.levelNumber && INDONESIA_IMAGE_MAP[challenge.levelNumber]) ||
     (challenge.id === 'indo-50-papua-danau-sentani' && '/city-images/indo_danau_sentani.jpg') ||
     (!challenge.id.startsWith('indo-') && challenge.levelNumber && LEVEL_IMAGE_MAP[challenge.levelNumber]) ||
     (challenge.panoId
@@ -306,8 +307,8 @@ export const StreetViewViewer: React.FC<StreetViewViewerProps> = ({
           filter: isSepiaActive
             ? 'sepia(0.65) contrast(1.15) saturate(0.85) brightness(0.95)'
             : isVhsActive
-            ? 'contrast(1.25) saturate(1.3) hue-rotate(-12deg)'
-            : undefined,
+              ? 'contrast(1.25) saturate(1.3) hue-rotate(-12deg)'
+              : undefined,
         }}
         className="w-full h-full transition-all duration-700"
       />
@@ -324,8 +325,8 @@ export const StreetViewViewer: React.FC<StreetViewViewerProps> = ({
               filter: isSepiaActive
                 ? 'sepia(0.65) contrast(1.15) saturate(0.85) brightness(0.95)'
                 : isVhsActive
-                ? 'contrast(1.25) saturate(1.3) hue-rotate(-12deg)'
-                : undefined,
+                  ? 'contrast(1.25) saturate(1.3) hue-rotate(-12deg)'
+                  : undefined,
             }}
           />
           {/* Archival Mode HUD Banner */}
@@ -403,11 +404,10 @@ export const StreetViewViewer: React.FC<StreetViewViewerProps> = ({
           onClick={() => setUseFallbackImage(!useFallbackImage)}
           title={useFallbackImage ? (lang === 'en' ? 'Switch to Street View 360' : 'Beralih ke Street View 360') : (lang === 'en' ? 'View HD Archival Photo' : 'Lihat Foto Arsip HD')}
           aria-label="Toggle Viewer Mode"
-          className={`p-2.5 rounded-xl border shadow-lg backdrop-blur-md transition active:scale-95 cursor-pointer ${
-            useFallbackImage
+          className={`p-2.5 rounded-xl border shadow-lg backdrop-blur-md transition active:scale-95 cursor-pointer ${useFallbackImage
               ? 'bg-amber-500/30 border-amber-400 text-amber-300'
               : 'bg-slate-900/80 border-slate-700 text-slate-300 hover:bg-slate-800'
-          }`}
+            }`}
         >
           {useFallbackImage ? <Camera className="w-5 h-5 text-amber-400" /> : <ImageIcon className="w-5 h-5 text-slate-200" />}
         </button>
@@ -443,11 +443,10 @@ export const StreetViewViewer: React.FC<StreetViewViewerProps> = ({
           onClick={() => setVintageFilterActive(!vintageFilterActive)}
           title={t.vintageFilter}
           aria-label={t.vintageFilter}
-          className={`p-2.5 rounded-xl border shadow-lg backdrop-blur-md transition active:scale-95 cursor-pointer ${
-            vintageFilterActive
+          className={`p-2.5 rounded-xl border shadow-lg backdrop-blur-md transition active:scale-95 cursor-pointer ${vintageFilterActive
               ? 'bg-amber-500/25 border-amber-400/80 text-amber-300'
               : 'bg-slate-900/80 border-slate-700 text-slate-300 hover:bg-slate-800'
-          }`}
+            }`}
         >
           <Sparkles className="w-5 h-5" />
         </button>

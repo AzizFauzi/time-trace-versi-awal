@@ -254,12 +254,12 @@ export default function App() {
       playerProgress.levels[levelNumber] && playerProgress.levels[levelNumber].score >= MINIMUM_PASS_SCORE
     );
 
-    // If level is uncleared and no daily chances left, block and open VIP subscription modal
-    if (!isAlreadyPassed && dailyChances.remaining <= 0) {
-      soundManager.playModalOpen();
-      setIsPremiumWaitlistOpen(true);
-      return;
-    }
+    // [TESTING MODE] Daily chances check disabled
+    // if (!isAlreadyPassed && dailyChances.remaining <= 0) {
+    //   soundManager.playModalOpen();
+    //   setIsPremiumWaitlistOpen(true);
+    //   return;
+    // }
 
     const challenge = getChallengeByLevel(levelNumber);
     setGameMode('campaign');
@@ -278,11 +278,12 @@ export default function App() {
 
   // Start daily mystery challenge
   const startDailyChallenge = () => {
-    if (dailyChances.remaining <= 0) {
-      soundManager.playModalOpen();
-      setIsPremiumWaitlistOpen(true);
-      return;
-    }
+    // [TESTING MODE] Daily chances check disabled
+    // if (dailyChances.remaining <= 0) {
+    //   soundManager.playModalOpen();
+    //   setIsPremiumWaitlistOpen(true);
+    //   return;
+    // }
     const dailyLevel = getDailyChallengeId(100);
     const challenge = getChallengeByLevel(dailyLevel);
     setGameMode('daily');
@@ -301,11 +302,12 @@ export default function App() {
 
   // Start quick expedition (5 rounds) by region
   const startQuickExpedition = (regionToUse: RegionId = selectedRegion) => {
-    if (dailyChances.remaining <= 0) {
-      soundManager.playModalOpen();
-      setIsPremiumWaitlistOpen(true);
-      return;
-    }
+    // [TESTING MODE] Daily chances check disabled
+    // if (dailyChances.remaining <= 0) {
+    //   soundManager.playModalOpen();
+    //   setIsPremiumWaitlistOpen(true);
+    //   return;
+    // }
     setSelectedRegion(regionToUse);
     const pool = getChallengesByRegion(regionToUse);
     const shuffled = [...pool].sort(() => 0.5 - Math.random());
@@ -327,11 +329,12 @@ export default function App() {
 
   // Start Indonesia heritage campaign (50 sequential cases)
   const startIndonesiaCampaign = (caseNumber: number = 1) => {
-    if (dailyChances.remaining <= 0) {
-      soundManager.playModalOpen();
-      setIsPremiumWaitlistOpen(true);
-      return;
-    }
+    // [TESTING MODE] Daily chances check disabled
+    // if (dailyChances.remaining <= 0) {
+    //   soundManager.playModalOpen();
+    //   setIsPremiumWaitlistOpen(true);
+    //   return;
+    // }
     const safeCase = Math.max(1, Math.min(50, caseNumber));
     const challenge = LEVELS_JELAJAH_INDONESIA[safeCase - 1] || LEVELS_JELAJAH_INDONESIA[0];
     setGameMode('indonesia');
@@ -697,7 +700,10 @@ export default function App() {
           onStartExpedition={(reg) => startQuickExpedition(reg)}
           onStartDaily={startDailyChallenge}
           onStartIndonesia={(caseNum) => startIndonesiaCampaign(caseNum || indonesiaProgress.unlockedCase || 1)}
-          onOpenIndonesiaSelector={() => setIsIndonesiaModalOpen(true)}
+          onOpenIndonesiaSelector={() => {
+            soundManager.playModalOpen();
+            setIsIndonesiaModalOpen(true);
+          }}
           onOpenLevelSelector={openLevelModal}
           onOpenPassport={(tab) => openPassportModal(tab || 'shop')}
           onOpenHowToPlay={openHowToPlayModal}
@@ -720,6 +726,18 @@ export default function App() {
           dailyChances={dailyChances}
           timeUntilTomorrow={timeUntilTomorrow}
           onOpenClaimGelar={() => setShowGrandVictoryModal(true)}
+        />
+
+        {/* 50-Case Indonesia Heritage Selector Modal */}
+        <IndonesiaCaseSelectorModal
+          isOpen={isIndonesiaModalOpen}
+          onClose={() => setIsIndonesiaModalOpen(false)}
+          onSelectCase={(caseNum) => startIndonesiaCampaign(caseNum)}
+          allCases={LEVELS_JELAJAH_INDONESIA}
+          progress={indonesiaProgress}
+          lang={lang}
+          dailyChances={dailyChances}
+          timeUntilTomorrow={timeUntilTomorrow}
         />
 
         <HistoryAndPassportModal

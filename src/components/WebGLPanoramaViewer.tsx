@@ -14,7 +14,7 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { Language, TRANSLATIONS } from '../utils/i18n';
-import { LEVEL_IMAGE_MAP } from '../utils/cityImageHelper';
+import { LEVEL_IMAGE_MAP, INDONESIA_IMAGE_MAP } from '../utils/cityImageHelper';
 
 declare global {
   interface Window {
@@ -51,6 +51,7 @@ export const WebGLPanoramaViewer: React.FC<WebGLPanoramaViewerProps> = ({
 
   // High-resolution photographic asset
   const photoAssetUrl =
+    (challenge.id.startsWith('indo-') && challenge.levelNumber && INDONESIA_IMAGE_MAP[challenge.levelNumber]) ||
     (challenge.id === 'indo-50-papua-danau-sentani' && '/city-images/indo_danau_sentani.jpg') ||
     (!challenge.id.startsWith('indo-') && challenge.levelNumber && LEVEL_IMAGE_MAP[challenge.levelNumber]) ||
     (challenge.panoId && apiKey

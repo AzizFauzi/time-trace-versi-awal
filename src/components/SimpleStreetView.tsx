@@ -6,7 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { HistoricalPano } from '../data/challenges';
 import { Language, TRANSLATIONS } from '../utils/i18n';
-import { LEVEL_IMAGE_MAP } from '../utils/cityImageHelper';
+import { LEVEL_IMAGE_MAP, INDONESIA_IMAGE_MAP } from '../utils/cityImageHelper';
 
 interface SimpleStreetViewProps {
   challenge: HistoricalPano;
@@ -33,19 +33,24 @@ export const SimpleStreetView: React.FC<SimpleStreetViewProps> = ({
 
     let url = '';
 
-    // 1️⃣ Special archival photo
-    if (challenge.id === 'indo-50-papua-danau-sentani') {
-      url = '/city-images/indo_danau_sentani.jpg';
+    // 1️⃣ Jelajah Indonesia mode (50 Kasus Nusantara)
+    if (challenge.id.startsWith('indo-')) {
+      if (challenge.levelNumber && INDONESIA_IMAGE_MAP[challenge.levelNumber]) {
+        url = INDONESIA_IMAGE_MAP[challenge.levelNumber];
+      } else if (challenge.id === 'indo-50-papua-danau-sentani') {
+        url = '/city-images/indo_danau_sentani.jpg';
+      } else {
+        url = '/city-images/L1_Jakarta.png';
+      }
     }
-    // 2️⃣ Level-specific local image from LEVEL_IMAGE_MAP
+    // 2️⃣ Campaign 100 Levels from LEVEL_IMAGE_MAP
     else if (
-      !challenge.id.startsWith('indo-') &&
       challenge.levelNumber &&
       LEVEL_IMAGE_MAP[challenge.levelNumber]
     ) {
       url = LEVEL_IMAGE_MAP[challenge.levelNumber];
     }
-    // 3️⃣ Google Street View Static API (simple GET, no JS SDK needed)
+    // 3️⃣ Google Street View Static API fallback (if apiKey exists and is working)
     else if (apiKey) {
       const { lat, lng } = challenge.streetViewOptions.position;
       if (challenge.panoId) {
@@ -54,9 +59,9 @@ export const SimpleStreetView: React.FC<SimpleStreetViewProps> = ({
         url = `https://maps.googleapis.com/maps/api/streetview?size=1600x900&location=${lat},${lng}&radius=500&fov=90&heading=${challenge.streetViewOptions.pov.heading}&pitch=${challenge.streetViewOptions.pov.pitch}&key=${apiKey}`;
       }
     }
-    // 4️⃣ Generic placeholder
+    // 4️⃣ Default fallback image
     else {
-      url = '/assets/placeholder-streetview.jpg';
+      url = '/assets/hero_background.png';
     }
 
     setImageUrl(url);
@@ -95,13 +100,7 @@ export const SimpleStreetView: React.FC<SimpleStreetViewProps> = ({
           loading="eager"
         />
       )}
-
-      {/* City / location label */}
-      {!loading && !imgError && (
-        <div className="absolute bottom-3 left-3 bg-black/50 text-white/70 text-xs px-2 py-1 rounded backdrop-blur-sm">
-          {challenge.city}
-        </div>
-      )}
     </div>
   );
 };
+

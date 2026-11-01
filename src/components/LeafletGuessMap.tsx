@@ -79,6 +79,7 @@ export const LeafletGuessMap: React.FC<LeafletGuessMapProps> = ({
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [activeTheme, setActiveTheme] = useState<'voyager' | 'dark' | 'osm'>('voyager');
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchBarRef = useRef<HTMLDivElement>(null);
 
   // Custom marker icons using SVG for crisp high-DPI rendering
   const createGuessIcon = () =>
@@ -307,7 +308,7 @@ export const LeafletGuessMap: React.FC<LeafletGuessMapProps> = ({
 
   return (
     <div
-      className={`relative transition-all duration-300 ease-out z-20 flex flex-col bg-slate-900/95 backdrop-blur-md border border-amber-500/30 rounded-2xl shadow-2xl overflow-hidden ${
+      className={`relative transition-all duration-300 ease-out z-20 flex flex-col bg-slate-900/95 backdrop-blur-md border border-amber-500/30 rounded-2xl shadow-2xl ${
         isExpanded
           ? 'w-[94vw] h-[78vh] sm:w-[85vw] sm:h-[75vh] md:w-[720px] md:h-[550px]'
           : 'w-[280px] h-[220px] sm:w-[320px] sm:h-[260px] md:w-[380px] md:h-[300px]'
@@ -319,9 +320,6 @@ export const LeafletGuessMap: React.FC<LeafletGuessMapProps> = ({
           <MapPin className="w-3.5 h-3.5 text-amber-400" />
           <span className="tracking-wide uppercase font-mono">
             {confirmed ? 'Evaluasi Koordinat' : 'Tancapkan Pin Lokasi'}
-          </span>
-          <span className="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-            Rp 0 OSM
           </span>
         </div>
 
@@ -351,9 +349,12 @@ export const LeafletGuessMap: React.FC<LeafletGuessMapProps> = ({
 
       {/* City Search Bar (always visible when not confirmed) */}
       {!confirmed && (
-        <div className="relative px-2.5 py-1.5 bg-slate-950/80 border-b border-slate-800">
+        <div ref={searchBarRef} className="px-2.5 py-1.5 bg-slate-950/80 border-b border-slate-800">
           <div className="relative flex items-center">
-            <Search className="w-3.5 h-3.5 absolute left-2 text-slate-400" />
+            {isSearching
+              ? <Loader2 className="w-3.5 h-3.5 absolute left-2 text-amber-400 animate-spin" />
+              : <Search className="w-3.5 h-3.5 absolute left-2 text-slate-400" />
+            }
             <input
               type="text"
               value={searchQuery}
@@ -373,34 +374,28 @@ export const LeafletGuessMap: React.FC<LeafletGuessMapProps> = ({
               </button>
             )}
           </div>
+        </div>
+      )}
 
-          {/* Loading indicator */}
-          {isSearching && (
-            <div className="absolute left-2.5 right-2.5 top-full mt-1 bg-slate-900/98 border border-amber-500/30 rounded-lg shadow-xl z-50 px-3 py-2 flex items-center gap-2 text-xs text-slate-400">
-              <Loader2 className="w-3 h-3 animate-spin text-amber-400" />
-              Mencari lokasi...
-            </div>
-          )}
-
-          {/* Autocomplete Dropdown */}
-          {!isSearching && searchResults.length > 0 && (
-            <div className="absolute left-2.5 right-2.5 top-full mt-1 bg-slate-900/98 border border-amber-500/30 rounded-lg shadow-xl overflow-hidden z-50 max-h-48 overflow-y-auto">
-              {searchResults.map((city, idx) => (
-                <button
-                  key={`${city.lat}-${city.lng}-${idx}`}
-                  onClick={() => handleSelectCity(city)}
-                  className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-amber-500/20 hover:text-amber-200 flex items-start gap-2 border-b border-slate-800 last:border-0"
-                >
-                  <MapPin className="w-3 h-3 mt-0.5 shrink-0 text-amber-400" />
-                  <span className="line-clamp-2">{city.name}</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* No results */}
-          {!isSearching && searchQuery.trim().length >= 2 && searchResults.length === 0 && (
-            <div className="absolute left-2.5 right-2.5 top-full mt-1 bg-slate-900/98 border border-slate-700 rounded-lg shadow-xl z-50 px-3 py-2 text-xs text-slate-500">
+      {/* Dropdown rendered OUTSIDE the overflow-hidden wrapper — floats over the map */}
+      {!confirmed && (searchResults.length > 0 || (!isSearching && searchQuery.trim().length >= 2 && searchResults.length === 0)) && (
+        <div
+          className="absolute left-2.5 right-2.5 z-[999] bg-slate-900 border border-amber-500/40 rounded-lg shadow-2xl max-h-52 overflow-y-auto"
+          style={{ top: searchBarRef.current ? searchBarRef.current.offsetTop + searchBarRef.current.offsetHeight + 2 : 70 }}
+        >
+          {searchResults.length > 0 ? (
+            searchResults.map((city, idx) => (
+              <button
+                key={`${city.lat}-${city.lng}-${idx}`}
+                onClick={() => handleSelectCity(city)}
+                className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-amber-500/20 hover:text-amber-200 flex items-start gap-2 border-b border-slate-800 last:border-0"
+              >
+                <MapPin className="w-3 h-3 mt-0.5 shrink-0 text-amber-400" />
+                <span className="line-clamp-2">{city.name}</span>
+              </button>
+            ))
+          ) : (
+            <div className="px-3 py-2 text-xs text-slate-500">
               Tidak ditemukan. Coba nama lain.
             </div>
           )}

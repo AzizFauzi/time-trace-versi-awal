@@ -108,6 +108,63 @@ export const LEVEL_IMAGE_MAP: Record<number, string> = {
   100: '/city-images/L5_Mountain View.png',
 };
 
+/**
+ * 50 Kasus Jelajah Indonesia Image Mapping
+ * 50 Landmark & Kota Unik dari Sabang sampai Merauke - 100% Foto Otentik & Relevan
+ */
+export const INDONESIA_IMAGE_MAP: Record<number, string> = {
+  1: '/city-images/indo_1_jakarta.png',             // Jakarta (Bundaran HI)
+  2: '/city-images/indo_2_surabaya.png',            // Surabaya (Jembatan Merah)
+  3: '/city-images/indo_3_bandung.png',             // Bandung (Gedung Sate)
+  4: '/city-images/indo_4_yogyakarta.png',          // Yogyakarta (Malioboro)
+  5: '/city-images/indo_5_semarang.png',            // Semarang (Simpang Lima)
+  6: '/city-images/indo_6_surakarta.png',           // Surakarta / Solo (Pasar Gede Harjonagoro)
+  7: '/city-images/indo_7_malang.png',              // Malang (Balai Kota & Kayutangan)
+  8: '/city-images/indo_8_magelang.png',            // Magelang (Candi Borobudur)
+  9: '/city-images/indo_9_sleman.png',              // Sleman (Candi Prambanan)
+  10: '/city-images/indo_10_wonosobo.png',          // Wonosobo (Candi Arjuna Dieng)
+  11: '/city-images/indo_11_probolinggo.png',       // Probolinggo (Lautan Pasir Bromo)
+  12: '/city-images/indo_12_anyer.png',             // Anyer Serang (Mercusuar Cikoneng Titik Nol Daendels)
+  13: '/city-images/indo_13_kuta.png',              // Kuta (Pantai Kuta Bali)
+  14: '/city-images/indo_14_ubud.png',              // Ubud (Mandala Suci Wenara Wana Monkey Forest)
+  15: '/city-images/indo_15_tabanan.png',           // Tabanan (Pura Tanah Lot)
+  16: '/city-images/indo_16_jimbaran.png',          // Jimbaran (Taman Budaya GWK Garuda Wisnu Kencana)
+  17: '/city-images/indo_17_lombok.png',            // Lombok Barat (Pantai Senggigi)
+  18: '/city-images/indo_18_labuan_bajo.png',       // Labuan Bajo (Pelabuhan Bahari NTT)
+  19: '/city-images/indo_19_kupang.png',            // Kupang (Pesisir Teluk Kupang)
+  20: '/city-images/indo_20_medan.png',             // Medan (Istana Maimun)
+  21: '/city-images/indo_21_palembang.png',         // Palembang (Jembatan Ampera & Sungai Musi)
+  22: '/city-images/indo_22_bukittinggi.png',       // Bukittinggi (Jam Gadang)
+  23: '/city-images/indo_23_parapat.png',           // Parapat (Danau Toba & Pelabuhan Samosir)
+  24: '/city-images/indo_24_banda_aceh.png',        // Banda Aceh (Masjid Raya Baiturrahman)
+  25: '/city-images/indo_25_sabang.png',            // Sabang (Tugu Nol Kilometer Indonesia)
+  26: '/city-images/indo_26_payakumbuh.png',        // Payakumbuh (Jembatan Kelok 9)
+  27: '/city-images/indo_27_belitung.png',          // Belitung (Pantai Tanjung Tinggi Granit Laskar Pelangi)
+  28: '/city-images/indo_28_lampung.png',           // Bandar Lampung (Menara Siger)
+  29: '/city-images/indo_29_batam.png',             // Batam (Jembatan Barelang)
+  30: '/city-images/indo_30_pangkalpinang.png',     // Pangkalpinang (Jembatan Emas)
+  31: '/city-images/indo_31_jambi.png',             // Jambi (Jembatan Gentala Arasy)
+  32: '/city-images/indo_32_bengkulu.png',          // Bengkulu (Benteng Marlborough)
+  33: '/city-images/indo_33_pekanbaru.png',         // Pekanbaru (Jembatan Siak)
+  34: '/city-images/indo_34_pontianak.png',         // Pontianak (Tugu Khatulistiwa)
+  35: '/city-images/indo_35_banjarmasin.png',       // Banjarmasin (Pasar Terapung Lok Baintan)
+  36: '/city-images/indo_36_balikpapan.png',        // Balikpapan (Pantai Melawai)
+  37: '/city-images/indo_37_samarinda.png',         // Samarinda (Jembatan Mahakam)
+  38: '/city-images/indo_38_palangkaraya.png',      // Palangkaraya (Jembatan Kahayan)
+  39: '/city-images/indo_39_tarakan.png',           // Tarakan (Mangrove & Pesisir Tarakan)
+  40: '/city-images/indo_40_makassar.png',          // Makassar (Benteng Rotterdam & Losari)
+  41: '/city-images/indo_41_manado.png',            // Manado (Jembatan Soekarno)
+  42: '/city-images/indo_42_toraja.png',            // Tana Toraja (Desa Adat Kete Kesu Tongkonan)
+  43: '/city-images/indo_43_palu.png',              // Palu (Teluk Palu & Jembatan Kuning)
+  44: '/city-images/indo_44_kendari.png',           // Kendari (Jembatan Teluk Kendari)
+  45: '/city-images/indo_45_gorontalo.png',         // Gorontalo (Benteng Otanaha)
+  46: '/city-images/indo_46_ambon.png',             // Ambon (Jembatan Merah Putih)
+  47: '/city-images/indo_47_ternate.png',           // Ternate (Benteng Tolukko & Gunung Gamalama)
+  48: '/city-images/indo_48_jayapura.png',          // Jayapura (Jembatan Youtefa)
+  49: '/city-images/indo_49_sentani.png',           // Sentani (Danau Sentani & Bukit Tungkuwiri)
+  50: '/city-images/indo_50_sorong.png',            // Sorong (Pelabuhan Pesisir Sorong Raja Ampat)
+};
+
 export interface ExploredLocationCard {
   level: number;
   image: string;

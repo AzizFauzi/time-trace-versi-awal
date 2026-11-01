@@ -1,11 +1,25 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Maximize2, Minimize2, MapPin, Undo2, Search, X, Navigation, Check } from 'lucide-react';
+import { Maximize2, Minimize2, MapPin, Undo2, Search, X, Check, Loader2 } from 'lucide-react';
 import { Language, RegionId, TRANSLATIONS } from '../utils/i18n';
 import { REGION_MAP_CONFIGS } from '../utils/regionMapConfigs';
-import { POPULAR_CITIES, searchLocalCities, CityRecord } from '../utils/citiesDatabase';
 import { soundManager } from '../utils/soundManager';
+
+interface NominatimResult {
+  place_id: number;
+  display_name: string;
+  lat: string;
+  lon: string;
+  type: string;
+  class: string;
+}
+
+interface CityResult {
+  name: string;
+  lat: number;
+  lng: number;
+}
 
 interface LeafletGuessMapProps {
   onLocationSelected: (location: { lat: number; lng: number } | null) => void;
@@ -61,9 +75,10 @@ export const LeafletGuessMap: React.FC<LeafletGuessMapProps> = ({
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<CityRecord[]>([]);
+  const [searchResults, setSearchResults] = useState<CityResult[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [activeTheme, setActiveTheme] = useState<'voyager' | 'dark' | 'osm'>('voyager');
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Custom marker icons using SVG for crisp high-DPI rendering
   const createGuessIcon = () =>
@@ -242,24 +257,46 @@ export const LeafletGuessMap: React.FC<LeafletGuessMapProps> = ({
     return () => clearTimeout(timer);
   }, [isExpanded]);
 
-  // Handle city search autocomplete
-  const handleSearch = (query: string) => {
+  // Nominatim geocoding search (OpenStreetMap, free, no API key)
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
+    setSearchResults([]);
+
     if (query.trim().length < 2) {
-      setSearchResults([]);
       setIsSearching(false);
       return;
     }
-    setIsSearching(true);
-    const results = searchLocalCities(query).slice(0, 5);
-    setSearchResults(results);
-  };
 
-  const handleSelectCity = (city: CityRecord) => {
+    // Debounce: wait 400ms after user stops typing before calling API
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    setIsSearching(true);
+
+    searchDebounceRef.current = setTimeout(async () => {
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=6&addressdetails=0`;
+        const res = await fetch(url, {
+          headers: { 'Accept-Language': 'id,en', 'User-Agent': 'TimeTrace-Game/1.0' },
+        });
+        const data: NominatimResult[] = await res.json();
+        const results: CityResult[] = data.map((r) => ({
+          name: r.display_name,
+          lat: parseFloat(r.lat),
+          lng: parseFloat(r.lon),
+        }));
+        setSearchResults(results);
+      } catch {
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 400);
+  }, []);
+
+  const handleSelectCity = (city: CityResult) => {
     if (!mapInstanceRef.current) return;
     // Pan map to the selected city
     mapInstanceRef.current.setView([city.lat, city.lng], 12, { animate: true });
-    // Drop the guess pin at the city location (same as clicking on the map)
+    // Drop the guess pin at the city location
     soundManager.playTick();
     onLocationSelected({ lat: city.lat, lng: city.lng });
     // Clear search
@@ -337,19 +374,34 @@ export const LeafletGuessMap: React.FC<LeafletGuessMapProps> = ({
             )}
           </div>
 
+          {/* Loading indicator */}
+          {isSearching && (
+            <div className="absolute left-2.5 right-2.5 top-full mt-1 bg-slate-900/98 border border-amber-500/30 rounded-lg shadow-xl z-50 px-3 py-2 flex items-center gap-2 text-xs text-slate-400">
+              <Loader2 className="w-3 h-3 animate-spin text-amber-400" />
+              Mencari lokasi...
+            </div>
+          )}
+
           {/* Autocomplete Dropdown */}
-          {searchResults.length > 0 && (
-            <div className="absolute left-2.5 right-2.5 top-full mt-1 bg-slate-900/98 border border-amber-500/30 rounded-lg shadow-xl overflow-hidden z-50">
-              {searchResults.map((city) => (
+          {!isSearching && searchResults.length > 0 && (
+            <div className="absolute left-2.5 right-2.5 top-full mt-1 bg-slate-900/98 border border-amber-500/30 rounded-lg shadow-xl overflow-hidden z-50 max-h-48 overflow-y-auto">
+              {searchResults.map((city, idx) => (
                 <button
-                  key={`${city.name}-${city.lat}`}
+                  key={`${city.lat}-${city.lng}-${idx}`}
                   onClick={() => handleSelectCity(city)}
-                  className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-amber-500/20 hover:text-amber-200 flex items-center justify-between border-b border-slate-800 last:border-0"
+                  className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-amber-500/20 hover:text-amber-200 flex items-start gap-2 border-b border-slate-800 last:border-0"
                 >
-                  <span className="font-semibold">{city.name}</span>
-                  <span className="text-[10px] text-slate-500">{city.country}</span>
+                  <MapPin className="w-3 h-3 mt-0.5 shrink-0 text-amber-400" />
+                  <span className="line-clamp-2">{city.name}</span>
                 </button>
               ))}
+            </div>
+          )}
+
+          {/* No results */}
+          {!isSearching && searchQuery.trim().length >= 2 && searchResults.length === 0 && (
+            <div className="absolute left-2.5 right-2.5 top-full mt-1 bg-slate-900/98 border border-slate-700 rounded-lg shadow-xl z-50 px-3 py-2 text-xs text-slate-500">
+              Tidak ditemukan. Coba nama lain.
             </div>
           )}
         </div>

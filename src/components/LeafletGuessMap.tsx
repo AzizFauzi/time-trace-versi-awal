@@ -257,7 +257,12 @@ export const LeafletGuessMap: React.FC<LeafletGuessMapProps> = ({
 
   const handleSelectCity = (city: CityRecord) => {
     if (!mapInstanceRef.current) return;
+    // Pan map to the selected city
     mapInstanceRef.current.setView([city.lat, city.lng], 12, { animate: true });
+    // Drop the guess pin at the city location (same as clicking on the map)
+    soundManager.playTick();
+    onLocationSelected({ lat: city.lat, lng: city.lng });
+    // Clear search
     setSearchQuery('');
     setSearchResults([]);
     setIsSearching(false);
@@ -316,7 +321,7 @@ export const LeafletGuessMap: React.FC<LeafletGuessMapProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
-              placeholder="Cari kota (misal: Medan, Bandung, Makassar, Jayapura)..."
+              placeholder="🔍 Ketik nama kota untuk menempatkan pin..."
               className="w-full bg-slate-900 border border-slate-700/60 rounded-lg pl-7 pr-7 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/60"
             />
             {searchQuery && (

@@ -307,8 +307,8 @@ export const LeafletGuessMap: React.FC<LeafletGuessMapProps> = ({
         </div>
       </div>
 
-      {/* City Search Bar (Visible when expanded) */}
-      {isExpanded && !confirmed && (
+      {/* City Search Bar (always visible when not confirmed) */}
+      {!confirmed && (
         <div className="relative px-2.5 py-1.5 bg-slate-950/80 border-b border-slate-800">
           <div className="relative flex items-center">
             <Search className="w-3.5 h-3.5 absolute left-2 text-slate-400" />

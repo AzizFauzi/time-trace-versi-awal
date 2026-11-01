@@ -17,11 +17,11 @@ interface LeafletGuessMapProps {
   theme?: string;
 }
 
-// Tile layer configurations (100% Free OpenStreetMap & CartoDB tiles)
+// Tile layer configurations — 100% free, no API key required
 const TILE_LAYERS = {
-  voyager: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-  dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-  osm: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  voyager: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  dark: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+  osm: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 };
 
 // Calculate Haversine distance in KM
@@ -123,7 +123,8 @@ export const LeafletGuessMap: React.FC<LeafletGuessMapProps> = ({
     const tileUrl = theme.includes('dark') || theme.includes('navy') ? TILE_LAYERS.dark : TILE_LAYERS.voyager;
     const tile = L.tileLayer(tileUrl, {
       maxZoom: 19,
-      subdomains: 'abcd',
+      subdomains: 'abc',
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
     tileLayerRef.current = tile;
 

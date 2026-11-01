@@ -9,7 +9,7 @@ import {
 } from './data/challenges';
 import { calculateHaversineDistanceKm, calculateLocationScore, calculateYearScore, MINIMUM_PASS_SCORE } from './utils/scoring';
 import { StreetViewViewer } from './components/StreetViewViewer';
-import { GuessMap } from './components/GuessMap';
+import { LeafletGuessMap as GuessMap } from './components/LeafletGuessMap';
 import { YearPickerTimeline } from './components/YearPickerTimeline';
 import { ChronoGearPanel } from './components/ChronoGearPanel';
 import { RoundResultModal } from './components/RoundResultModal';
@@ -217,20 +217,15 @@ export default function App() {
   const playerRank = getPlayerRank(playerProgress.totalStars, lang);
   const dailyCompleted = isDailyCompletedToday(gamification);
 
-  // Initialize and load Google Maps SDK
+  // Initialize map and viewer readiness (Leaflet loads instantly without API)
   useEffect(() => {
-    loadGoogleMapsApi(API_KEY)
-      .then(() => {
-        setMapsLoaded(true);
-      })
-      .catch((err) => {
-        console.error('Failed to load Google Maps SDK', err);
-        setLoadError(
-          lang === 'en'
-            ? 'Failed to load Google Maps SDK. Please check your internet connection.'
-            : 'Gagal memuat Google Maps SDK. Pastikan koneksi internet stabil.'
-        );
+    setMapsLoaded(true);
+    // Optional background loader if Google SDK is available
+    if (API_KEY) {
+      loadGoogleMapsApi(API_KEY).catch(() => {
+        // Silent fallback: Leaflet handles all mapping
       });
+    }
   }, [lang]);
 
   // Live timer for midnight chances & chrono limit reset

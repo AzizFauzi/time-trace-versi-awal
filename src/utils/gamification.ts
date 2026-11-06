@@ -51,7 +51,13 @@ export interface GamificationState {
   activePerk: string; // 'none' | 'perk_time_shift' | etc.
 }
 
-const STORAGE_KEY = 'street_view_time_traveler_gamification_v1';
+const STORAGE_KEY = 'street_view_time_traveler_gamification_v2';
+
+if (typeof window !== 'undefined') {
+  try {
+    localStorage.removeItem('street_view_time_traveler_gamification_v1');
+  } catch (_) { }
+}
 
 export function calculateGrade(score: number): 'S' | 'A' | 'B' | 'C' | 'D' {
   if (score >= 9000) return 'S';
@@ -363,7 +369,7 @@ export function addGameHistory(entry: Omit<GameHistoryEntry, 'id' | 'timestamp' 
   // Sync latest score to global leaderboard (Supabase)
   try {
     submitPlayerScore(state.coins, state.history.length);
-  } catch (_) {}
+  } catch (_) { }
 
   return {
     coinsEarned: earnedCoins,

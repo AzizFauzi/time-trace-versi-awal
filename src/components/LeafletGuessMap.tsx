@@ -34,7 +34,7 @@ interface LeafletGuessMapProps {
 // Tile layer configurations — 100% free, no API key required
 const TILE_LAYERS = {
   voyager: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  dark: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+  dark: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
   osm: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 };
 
@@ -417,7 +417,7 @@ export const LeafletGuessMap: React.FC<LeafletGuessMapProps> = ({
             <span>Klik peta untuk meletakkan pin</span>
           )}
         </div>
-        <div className="text-slate-500 text-[9px]">© OpenStreetMap / CartoDB</div>
+        <div className="text-slate-500 text-[9px]">© OpenStreetMap</div>
       </div>
     </div>
   );

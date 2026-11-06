@@ -65,7 +65,6 @@ import {
   Compass,
   Trophy,
   History,
-  RotateCcw,
   Sparkles,
   CheckCircle2,
   Globe2,
@@ -92,6 +91,7 @@ import {
   X,
   Crown,
   ChevronDown,
+  Home,
 } from 'lucide-react';
 
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyAyHABnIHtU02YfBdzsXoK8wDg2_N324Uc';
@@ -254,12 +254,12 @@ export default function App() {
       playerProgress.levels[levelNumber] && playerProgress.levels[levelNumber].score >= MINIMUM_PASS_SCORE
     );
 
-    // [TESTING MODE] Daily chances check disabled
-    // if (!isAlreadyPassed && dailyChances.remaining <= 0) {
-    //   soundManager.playModalOpen();
-    //   setIsPremiumWaitlistOpen(true);
-    //   return;
-    // }
+    // If level is uncleared and no daily chances left, block and open VIP subscription modal
+    if (!isAlreadyPassed && dailyChances.remaining <= 0) {
+      soundManager.playModalOpen();
+      setIsPremiumWaitlistOpen(true);
+      return;
+    }
 
     const challenge = getChallengeByLevel(levelNumber);
     setGameMode('campaign');
@@ -278,12 +278,11 @@ export default function App() {
 
   // Start daily mystery challenge
   const startDailyChallenge = () => {
-    // [TESTING MODE] Daily chances check disabled
-    // if (dailyChances.remaining <= 0) {
-    //   soundManager.playModalOpen();
-    //   setIsPremiumWaitlistOpen(true);
-    //   return;
-    // }
+    if (dailyChances.remaining <= 0) {
+      soundManager.playModalOpen();
+      setIsPremiumWaitlistOpen(true);
+      return;
+    }
     const dailyLevel = getDailyChallengeId(100);
     const challenge = getChallengeByLevel(dailyLevel);
     setGameMode('daily');
@@ -302,12 +301,11 @@ export default function App() {
 
   // Start quick expedition (5 rounds) by region
   const startQuickExpedition = (regionToUse: RegionId = selectedRegion) => {
-    // [TESTING MODE] Daily chances check disabled
-    // if (dailyChances.remaining <= 0) {
-    //   soundManager.playModalOpen();
-    //   setIsPremiumWaitlistOpen(true);
-    //   return;
-    // }
+    if (dailyChances.remaining <= 0) {
+      soundManager.playModalOpen();
+      setIsPremiumWaitlistOpen(true);
+      return;
+    }
     setSelectedRegion(regionToUse);
     const pool = getChallengesByRegion(regionToUse);
     const shuffled = [...pool].sort(() => 0.5 - Math.random());
@@ -329,12 +327,16 @@ export default function App() {
 
   // Start Indonesia heritage campaign (50 sequential cases)
   const startIndonesiaCampaign = (caseNumber: number = 1) => {
-    // [TESTING MODE] Daily chances check disabled
-    // if (dailyChances.remaining <= 0) {
-    //   soundManager.playModalOpen();
-    //   setIsPremiumWaitlistOpen(true);
-    //   return;
-    // }
+    const isAlreadyPassed = Boolean(
+      indonesiaProgress.cases[caseNumber] && indonesiaProgress.cases[caseNumber].score >= MINIMUM_PASS_SCORE
+    );
+
+    if (!isAlreadyPassed && dailyChances.remaining <= 0) {
+      soundManager.playModalOpen();
+      setIsPremiumWaitlistOpen(true);
+      return;
+    }
+
     const safeCase = Math.max(1, Math.min(50, caseNumber));
     const challenge = LEVELS_JELAJAH_INDONESIA[safeCase - 1] || LEVELS_JELAJAH_INDONESIA[0];
     setGameMode('indonesia');
@@ -649,14 +651,30 @@ export default function App() {
   };
 
   const handleResetAllProgress = () => {
-    resetPlayerProgress();
-    resetGamification();
-    resetDailyChances();
-    resetChronoUsage();
-    setPlayerProgress(getPlayerProgress());
-    setGamification(getGamificationState());
-    setDailyChances(getDailyChances());
-    setChronoUsage(getChronoUsage());
+    soundManager.playClick();
+    const confirmMsg =
+      lang === 'en'
+        ? 'Are you sure you want to reset all game progress from scratch? All levels, cases, and coins will be reset.'
+        : 'Apakah Anda yakin ingin mereset seluruh progres permainan dari awal? Semua level, kasus, dan koin akan direset.';
+
+    if (window.confirm(confirmMsg)) {
+      try {
+        localStorage.clear();
+      } catch (e) {
+        console.error(e);
+      }
+      resetPlayerProgress();
+      resetIndonesiaProgress();
+      resetGamification();
+      resetDailyChances();
+      resetChronoUsage();
+      setPlayerProgress(getPlayerProgress());
+      setIndonesiaProgress(getIndonesiaProgress());
+      setGamification(getGamificationState());
+      setDailyChances(getDailyChances());
+      setChronoUsage(getChronoUsage());
+      window.location.reload();
+    }
   };
 
   const isGameOver =
@@ -1092,10 +1110,10 @@ export default function App() {
           {gameStarted && (
             <button
               onClick={() => setGameStarted(false)}
-              title={t.restart}
+              title={lang === 'en' ? 'Back to Main Menu' : 'Kembali ke Menu Utama'}
               className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer"
             >
-              <RotateCcw className="w-4 h-4" />
+              <Home className="w-4 h-4" />
             </button>
           )}
         </div>

@@ -16,7 +16,15 @@ export interface PlayerProgress {
   totalScore: number;
 }
 
-const STORAGE_KEY = 'street_view_time_traveler_progress_v2';
+const STORAGE_KEY = 'street_view_time_traveler_progress_v3';
+
+// Auto-cleanup legacy storage keys on load
+if (typeof window !== 'undefined') {
+  try {
+    localStorage.removeItem('street_view_time_traveler_indonesia_progress_v1');
+    localStorage.removeItem('street_view_time_traveler_progress_v2');
+  } catch (_) {}
+}
 
 export function calculateStars(score: number): number {
   if (score >= 8000) return 3;
@@ -127,7 +135,7 @@ export interface IndonesiaProgress {
   totalScore: number;
 }
 
-const INDONESIA_STORAGE_KEY = 'street_view_time_traveler_indonesia_progress_v1';
+const INDONESIA_STORAGE_KEY = 'street_view_time_traveler_indonesia_progress_v2';
 
 export function getIndonesiaProgress(): IndonesiaProgress {
   if (typeof window === 'undefined') {
@@ -289,8 +297,8 @@ export function getPlayerRank(totalStars: number, lang: Language): PlayerRank {
   };
 }
 
-const CHANCES_STORAGE_KEY = 'street_view_time_traveler_chances_v2';
-export const MAX_DAILY_CHANCES = 999; // [TESTING MODE] unlimited
+const CHANCES_STORAGE_KEY = 'street_view_time_traveler_chances_v4';
+export const MAX_DAILY_CHANCES = 5;
 
 export interface DailyChances {
   remaining: number; // 0 to 5

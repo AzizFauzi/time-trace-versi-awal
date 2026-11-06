@@ -1,1 +1,0 @@
-feat: integrate Supabase for global leaderboard and VIP pass waitlist with nickname customization

@@ -339,14 +339,22 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
         soundManager.playCorrect();
       } catch (_) {}
 
-      // Immediately sync with Supabase leaderboard table!
+      // Immediately sync with Supabase leaderboard table (updating existing player record via upsert)
       try {
+        const actualCases = Math.max(casesCompleted, (gamification?.history || []).length, 1);
+        let accuracyPct = 85;
+        if (gamification?.history && gamification.history.length > 0) {
+          const scoreSum = gamification.history.reduce((acc, h) => acc + (h.totalScore || 0), 0);
+          accuracyPct = Math.min(100, Math.max(10, Math.round(scoreSum / (gamification.history.length * 10000) * 100)));
+        }
+
         await submitPlayerScore(
-          Math.max(0, gamification?.coins || 500),
-          casesCompleted || 1,
-          85
+          gamification?.coins || 0,
+          actualCases,
+          accuracyPct,
+          true // forceUpdate to update nickname on the existing record
         );
-        const res = await fetchLeaderboard(gamification?.coins || 500, leaderboardPeriod);
+        const res = await fetchLeaderboard(gamification?.coins || 0, leaderboardPeriod);
         setLeaderboardList(res.players);
         setIsLiveLeaderboard(res.isLive);
       } catch (err) {

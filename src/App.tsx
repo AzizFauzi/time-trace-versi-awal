@@ -28,6 +28,7 @@ import { GrandVictoryCelebrationModal } from './components/GrandVictoryCelebrati
 import { PremiumWaitlistModal } from './components/PremiumWaitlistModal';
 import { AppBackground } from './components/AppBackground';
 import { HomeDashboard } from './components/HomeDashboard';
+import { submitPlayerScore } from './services/leaderboardService';
 import logoImg from './assets/logo.png';
 import { soundManager } from './utils/soundManager';
 import { Language, RegionId, TRANSLATIONS } from './utils/i18n';
@@ -475,13 +476,38 @@ export default function App() {
 
     setLastEarnedCoins(histRes.coinsEarned);
     setLastNewAchievements(histRes.newAchievements);
-    setGamification(getGamificationState());
+    const freshGamification = getGamificationState();
+    setGamification(freshGamification);
 
     if (histRes.coinsEarned > 0) {
       setTimeout(() => {
         soundManager.playCoin();
       }, 500);
     }
+
+    // Synchronize score with Supabase Leaderboard (UPSERT on player_id):
+    const campaignCount = Object.keys(playerProgress?.levels || {}).length;
+    const indoCount = Object.keys(indonesiaProgress?.cases || {}).length;
+    const casesSolved = Math.max(campaignCount + indoCount, freshGamification.history.length, 1);
+
+    let accuracyPct = 85;
+    if (freshGamification.history.length > 0) {
+      const scoreSum = freshGamification.history.reduce((acc, h) => acc + (h.totalScore || 0), 0);
+      accuracyPct = Math.min(100, Math.max(10, Math.round(scoreSum / (freshGamification.history.length * 10000) * 100)));
+    } else {
+      accuracyPct = Math.min(100, Math.max(10, Math.round((roundTotal / 10000) * 100)));
+    }
+
+    // Submit asynchronously without blocking game flow or modal animation
+    submitPlayerScore(freshGamification.coins, casesSolved, accuracyPct)
+      .then((ok) => {
+        if (ok) {
+          console.log('[TimeTrace] Leaderboard synced successfully to Supabase:', freshGamification.coins);
+        }
+      })
+      .catch((err) => {
+        console.warn('[TimeTrace] Failed to sync leaderboard to Supabase:', err);
+      });
 
     // Deduct 1 usage from equipped photo filter and map theme (3x daily quota per item)
     let currentChrono = getChronoUsage();

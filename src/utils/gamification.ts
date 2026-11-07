@@ -1,5 +1,4 @@
 import { Language } from './i18n';
-import { submitPlayerScore } from '../services/leaderboardService';
 
 export interface GameHistoryEntry {
   id: string;
@@ -365,11 +364,6 @@ export function addGameHistory(entry: Omit<GameHistoryEntry, 'id' | 'timestamp' 
   if (state.coins >= 2500) checkUnlock('rich_traveler');
 
   saveGamificationState(state);
-
-  // Sync latest score to global leaderboard (Supabase)
-  try {
-    submitPlayerScore(state.coins, state.history.length);
-  } catch (_) { }
 
   return {
     coinsEarned: earnedCoins,

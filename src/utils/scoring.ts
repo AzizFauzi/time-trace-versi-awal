@@ -32,14 +32,18 @@ function toRad(degrees: number): number {
  */
 export const MINIMUM_PASS_SCORE = 3000;
 
-export type PassFailureReason = 'location_miss' | 'year_miss' | 'score_below_minimum';
+export type PassFailureReason = 'location_miss' | 'score_below_minimum';
 
 /**
  * Evaluates whether a deduction passes the round/level:
- * To pass, player must:
- * 1. Reach the minimum total score (MINIMUM_PASS_SCORE = 3,000 pts out of 10,000 max)
- * 2. NOT completely miss the location (locationScore must be > 0 and distanceKm <= 1,500 km)
- * 3. NOT completely miss the year (yearScore must be > 0 and yearDiff <= 4 years)
+ * In Time Trace, identifying the location is the primary core objective:
+ * 1. Location accuracy is mandatory:
+ *    Player MUST have deduced the correct city / regional vicinity (distanceKm <= 750 km and locationScore >= 1,000 pts).
+ *    A player cannot pass by guessing a completely wrong city/continent (like Singapore vs Melbourne, 7,400 km away).
+ * 2. Total score must reach the passing threshold (MINIMUM_PASS_SCORE = 3,000 pts out of 10,000).
+ *    If the player correctly identifies the city (e.g. New York, distance 13 km -> ~4,800 pts),
+ *    the level is CLEARED (1 Star).
+ *    Accurate year deduction earns higher bonuses (2 Stars for close year, 3 Stars for exact year).
  */
 export function checkRoundPassed(
   totalScore: number,
@@ -51,17 +55,12 @@ export function checkRoundPassed(
   passed: boolean;
   reason?: PassFailureReason;
 } {
-  // If location is completely missed (> 1,500 km away or 0 location points):
-  if (distanceKm > 1500 || locationScore <= 0) {
+  // If location is completely missed (> 750 km away or location score < 1,000 pts):
+  if (distanceKm > 750 || locationScore < 1000) {
     return { passed: false, reason: 'location_miss' };
   }
 
-  // If year is completely missed (off by 5+ years or 0 year points):
-  if (yearDiff >= 5 || yearScore <= 0) {
-    return { passed: false, reason: 'year_miss' };
-  }
-
-  // Total score must meet minimum passing score
+  // Total score must meet minimum passing score (3,000 pts)
   if (totalScore < MINIMUM_PASS_SCORE) {
     return { passed: false, reason: 'score_below_minimum' };
   }

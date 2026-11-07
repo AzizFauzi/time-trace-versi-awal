@@ -295,7 +295,11 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
                 <div className="text-xs text-teal-200/90 font-medium">
                   {unlockedNextLevel
                     ? (lang === 'en' ? 'Next level unlocked!' : 'Level berikutnya terbuka!')
-                    : (lang === 'en' ? 'Deduction passed!' : 'Tebakan berhasil!')}
+                    : yearDiff === 0
+                    ? (lang === 'en' ? 'Bullseye! Perfect location and exact year!' : 'Sempurna! Lokasi dan tahun tepat 100%!')
+                    : yearDiff <= 2
+                    ? (lang === 'en' ? 'Great deduction! Accurate location & close year.' : 'Deduksi hebat! Lokasi akurat dan tahun mendekati.')
+                    : (lang === 'en' ? 'Location verified! Improve year deduction for 2–3 stars.' : 'Lokasi terverifikasi tepat! Tingkatkan tebakan tahun untuk 2–3 bintang.')}
                 </div>
               </div>
             </div>
@@ -312,10 +316,8 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
                 </div>
                 <div className="text-xs text-rose-300 font-medium">
                   {passReason === 'location_miss'
-                    ? (lang === 'en' ? 'Location missed! Too far from target (> 1,500 km).' : 'Lokasi meleset! Jarak pin terlalu jauh (> 1.500 km).')
-                    : passReason === 'year_miss'
-                      ? (lang === 'en' ? 'Year missed! Chronology off by ≥ 5 years.' : 'Tahun meleset! Kronologi selisih ≥ 5 tahun.')
-                      : (lang === 'en'
+                    ? (lang === 'en' ? 'Location missed! Too far from target (> 750 km).' : 'Lokasi meleset! Jarak pin terlalu jauh (> 750 km).')
+                    : (lang === 'en'
                         ? `Need ≥ ${MINIMUM_PASS_SCORE.toLocaleString(locale)} pts to pass.`
                         : `Butuh minimal ${MINIMUM_PASS_SCORE.toLocaleString(locale)} pts untuk lulus.`)}
                 </div>

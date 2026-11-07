@@ -10,11 +10,71 @@ export interface LeaderboardPlayer {
   casesSolved?: number;
   accuracyPct?: number;
   country?: string;
+  playerId?: string | null;
 }
 
 const DEFAULT_NICKNAME = 'Detektif Waktu';
 const NICKNAME_KEY = 'time_trace_player_nickname';
 const AVATAR_KEY = 'time_trace_player_avatar';
+
+// In-flight singleton promise to prevent concurrent calls from spawning multiple anonymous accounts
+let authInFlightPromise: Promise<string | null> | null = null;
+
+// Track highest submitted score to prevent stale out-of-order score overwrites
+let highestSubmittedScore = -1;
+
+/**
+ * Returns the unique player UUID from Supabase Auth.
+ * If the user already has a persisted session, returns that UUID.
+ * Otherwise, performs anonymous authentication (signInAnonymously) exactly once.
+ */
+export const getOrCreatePlayerId = async (): Promise<string | null> => {
+  if (!isSupabaseConfigured() || !supabase) {
+    return null;
+  }
+
+  // If authentication is already resolving, await the shared promise
+  if (authInFlightPromise) {
+    return authInFlightPromise;
+  }
+
+  authInFlightPromise = (async () => {
+    try {
+      // 1. Check existing session (restored from localStorage)
+      const { data: sessionData, error: sessionErr } = await supabase.auth.getSession();
+      if (!sessionErr && sessionData?.session?.user?.id) {
+        return sessionData.session.user.id;
+      }
+
+      // 2. Validate current authenticated user
+      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      if (!userErr && userData?.user?.id) {
+        return userData.user.id;
+      }
+
+      // 3. No active session: Sign in anonymously
+      const { data: authData, error: authErr } = await supabase.auth.signInAnonymously();
+      if (authErr) {
+        console.error('Supabase anonymous authentication failed:', authErr.message);
+        return null;
+      }
+
+      if (authData?.user?.id) {
+        return authData.user.id;
+      }
+
+      return null;
+    } catch (err) {
+      console.warn('Network or configuration error in getOrCreatePlayerId:', err);
+      return null;
+    } finally {
+      // Clear in-flight promise so future calls or retries can proceed
+      authInFlightPromise = null;
+    }
+  })();
+
+  return authInFlightPromise;
+};
 
 export const getPlayerNickname = (): string => {
   try {
@@ -31,7 +91,7 @@ export const setPlayerNickname = (name: string): void => {
       localStorage.setItem(NICKNAME_KEY, trimmed);
     }
   } catch (err) {
-    console.warn('Failed saving nickname:', err);
+    console.warn('Failed saving nickname to localStorage:', err);
   }
 };
 
@@ -47,7 +107,7 @@ export const setPlayerAvatar = (avatar: string): void => {
   try {
     localStorage.setItem(AVATAR_KEY, avatar);
   } catch (err) {
-    console.warn('Failed saving avatar:', err);
+    console.warn('Failed saving avatar to localStorage:', err);
   }
 };
 
@@ -62,7 +122,8 @@ const MOCK_PLAYERS = [
 ];
 
 /**
- * Fetch leaderboard from Supabase (or fallback to mock synced with player score)
+ * Fetch leaderboard from Supabase (or fallback to mock synced with player score).
+ * Accurately detects the current player using their Supabase Auth player_id UUID.
  */
 export const fetchLeaderboard = async (
   playerCurrentScore: number,
@@ -73,17 +134,28 @@ export const fetchLeaderboard = async (
 
   if (isSupabaseConfigured() && supabase) {
     try {
+      // Get current player UUID for accurate identification
+      const currentPlayerId = await getOrCreatePlayerId();
+
       const { data, error } = await supabase
         .from('leaderboard')
-        .select('*')
+        .select('id, player_id, nickname, score, avatar, cases_solved, accuracy_pct, country, created_at')
         .order('score', { ascending: false })
         .limit(10);
 
       if (!error && data && data.length > 0) {
         let playerIncluded = false;
         const livePlayers: LeaderboardPlayer[] = data.map((item, idx) => {
-          const isPlayer = item.nickname.toLowerCase() === playerName.toLowerCase();
-          if (isPlayer) playerIncluded = true;
+          // Identify player primarily by player_id, or fallback to nickname for legacy rows with NULL player_id
+          const isPlayer = Boolean(
+            (currentPlayerId && item.player_id === currentPlayerId) ||
+            (!item.player_id && item.nickname.toLowerCase() === playerName.toLowerCase())
+          );
+
+          if (isPlayer) {
+            playerIncluded = true;
+          }
+
           return {
             rank: idx + 1,
             name: item.nickname,
@@ -94,10 +166,36 @@ export const fetchLeaderboard = async (
             casesSolved: item.cases_solved,
             accuracyPct: item.accuracy_pct,
             country: item.country || 'ID',
+            playerId: item.player_id,
           };
         });
 
-        // If player is not in top 10, append them at their proper rank
+        // If player has a record outside top 10, fetch player's own record
+        if (!playerIncluded && currentPlayerId) {
+          const { data: myRecord } = await supabase
+            .from('leaderboard')
+            .select('id, player_id, nickname, score, avatar, cases_solved, accuracy_pct, country')
+            .eq('player_id', currentPlayerId)
+            .maybeSingle();
+
+          if (myRecord) {
+            livePlayers.push({
+              rank: livePlayers.length + 1,
+              name: `${myRecord.nickname} (Anda)`,
+              score: myRecord.score,
+              avatar: myRecord.avatar || playerAvatar,
+              badge: '⭐',
+              isCurrent: true,
+              casesSolved: myRecord.cases_solved,
+              accuracyPct: myRecord.accuracy_pct,
+              country: myRecord.country || 'ID',
+              playerId: myRecord.player_id,
+            });
+            playerIncluded = true;
+          }
+        }
+
+        // If player is not yet in Supabase but has local score > 0, show virtual placement
         if (!playerIncluded && playerCurrentScore > 0) {
           livePlayers.push({
             rank: livePlayers.length + 1,
@@ -145,22 +243,47 @@ export const fetchLeaderboard = async (
 };
 
 /**
- * Submit player score to Supabase leaderboard
+ * Submit player score to Supabase leaderboard using UPSERT on player_id.
+ * Ensures ONE PLAYER = ONE LEADERBOARD RECORD.
+ *
+ * @param score Current score (coins)
+ * @param casesSolved Actual cases completed
+ * @param accuracyPct Actual accuracy percentage
+ * @param forceUpdate Whether to force an update even if score didn't increase (e.g. nickname changes)
  */
 export const submitPlayerScore = async (
   score: number,
   casesSolved: number = 1,
-  accuracyPct: number = 85
+  accuracyPct: number = 85,
+  forceUpdate: boolean = false
 ): Promise<boolean> => {
   const safeScore = Math.max(0, score);
+
+  if (!isSupabaseConfigured() || !supabase) {
+    return false;
+  }
+
+  // Prevent stale, out-of-order lower score from overwriting newer higher score (unless forceUpdate)
+  if (safeScore < highestSubmittedScore && !forceUpdate) {
+    return true;
+  }
+
+  // Retrieve or create the unique Supabase Auth UUID
+  const playerId = await getOrCreatePlayerId();
+  if (!playerId) {
+    console.warn('Supabase leaderboard sync aborted: could not obtain anonymous playerId');
+    return false;
+  }
 
   const nickname = getPlayerNickname();
   const avatar = getPlayerAvatar();
 
-  if (isSupabaseConfigured() && supabase) {
-    try {
-      const { error } = await supabase.from('leaderboard').insert([
+  try {
+    const { error } = await supabase
+      .from('leaderboard')
+      .upsert(
         {
+          player_id: playerId,
           nickname,
           score: safeScore,
           cases_solved: casesSolved,
@@ -168,17 +291,20 @@ export const submitPlayerScore = async (
           avatar,
           country: 'ID',
         },
-      ]);
+        {
+          onConflict: 'player_id',
+        }
+      );
 
-      if (error) {
-        console.error('Error submitting score to Supabase:', error.message);
-        return false;
-      }
-      return true;
-    } catch (err) {
-      console.warn('Network error submitting score to Supabase:', err);
+    if (error) {
+      console.error('Error upserting leaderboard record in Supabase:', error.message);
+      return false;
     }
-  }
 
-  return false;
+    highestSubmittedScore = Math.max(highestSubmittedScore, safeScore);
+    return true;
+  } catch (err) {
+    console.warn('Network exception upserting leaderboard record:', err);
+    return false;
+  }
 };

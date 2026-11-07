@@ -1137,7 +1137,7 @@ export default function App() {
           {/* Exit / Return to Menu Button */}
           {gameStarted && (
             <button
-              onClick={() => setGameStarted(false)}
+              onClick={handleBackToHome}
               title={lang === 'en' ? 'Back to Main Menu' : 'Kembali ke Menu Utama'}
               className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer"
             >

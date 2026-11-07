@@ -52,8 +52,8 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
               </h2>
               <p className="text-xs text-slate-400 hidden sm:block">
                 {lang === 'en'
-                  ? 'Master forensic visual deduction, geo-guessing, and daily chances rules.'
-                  : 'Kuasai teknik deduksi visual arsip masa lalu, penempatan pin peta, dan aturan 3 kesempatan harian.'}
+                  ? 'Master forensic visual deduction, city searching, and daily chances rules.'
+                  : 'Kuasai teknik deduksi visual arsip masa lalu, pencarian kota, dan aturan 5 kesempatan harian.'}
               </p>
             </div>
           </div>
@@ -102,7 +102,7 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
             }`}
           >
             <Heart className="w-3.5 h-3.5 text-rose-400" />
-            <span>{lang === 'en' ? '3. 100 Levels & 3 Chances' : '3. Aturan 100 Level & 3 Nyawa'}</span>
+            <span>{lang === 'en' ? '3. 100 Levels & 5 Chances' : '3. Aturan 100 Level & 5 Nyawa'}</span>
           </button>
 
           <button
@@ -181,16 +181,16 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
                   </div>
                   <h4 className="text-sm font-bold text-white flex items-center gap-1.5 mb-1.5">
                     <MapPin className="w-4 h-4 text-emerald-400" />
-                    <span>{lang === 'en' ? 'Type or Pin City Location' : 'Ketik & Tentukan Lokasi Kota'}</span>
+                    <span>{lang === 'en' ? 'Search & Select Target City' : 'Cari & Pilih Nama Kota Target'}</span>
                   </h4>
                   <p className="text-xs text-slate-300 leading-relaxed">
                     {lang === 'en'
-                      ? 'Type the city or place name in the search bar to automatically drop your guess pin, or click directly on the interactive map.'
-                      : 'Ketik nama kota atau wilayah pada kolom pencarian peta untuk langsung menaruh pin tebakan secara cepat dan presisi, atau klik langsung pada area peta.'}
+                      ? 'Type the city, country, or landmark name in the search bar to lock in your location deduction, or click directly on the interactive map.'
+                      : 'Ketik nama kota, negara, atau wilayah pada kolom pencarian untuk menentukan deduksi lokasimu secara cepat dan presisi, atau klik langsung pada area peta.'}
                   </p>
                 </div>
                 <div className="mt-3 text-[11px] text-slate-500 font-mono">
-                  {lang === 'en' ? 'Tip: Type cities like "Jakarta", "Tokyo", or "Paris" for instant precision' : 'Tips: Ketik kota seperti "Jakarta", "Surabaya", "Tokyo" untuk pin instan'}
+                  {lang === 'en' ? 'Tip: Type cities like "Jakarta", "Tokyo", or "Paris" for instant selection' : 'Tips: Ketik nama kota seperti "Jakarta", "Surabaya", "Tokyo" untuk memilih cepat'}
                 </div>
               </div>
 
@@ -323,19 +323,19 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
           </div>
         )}
 
-        {/* Tab 3: 100 Levels & 3 Chances Rules */}
+        {/* Tab 3: 100 Levels & 5 Chances Rules */}
         {activeTab === 'rules' && (
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
             <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/25 flex items-start gap-3">
               <Heart className="w-6 h-6 text-rose-500 fill-rose-500 shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-sm font-bold text-white mb-1">
-                  {lang === 'en' ? '3 Daily Attempts System (3 Kesempatan Harian)' : 'Sistem 3 Kesempatan / Nyawa Harian'}
+                  {lang === 'en' ? '5 Daily Chances System (5 Kesempatan Harian)' : 'Sistem 5 Kesempatan / Nyawa Harian'}
                 </h4>
                 <p className="text-xs text-slate-300 leading-relaxed">
                   {lang === 'en'
-                    ? 'Every day, each detective receives 3 chances (nyawa) to investigate and pass levels. If your answer score is below the strict minimum threshold (3,000 pts), 1 life is lost!'
-                    : 'Setiap hari, masing-masing pemain dibekali 3 kesempatan (nyawa). Jika hasil tebakanmu kurang dari batas minimum (3.000 pts), nyawamu berkurang 1!'}
+                    ? 'Every day, each detective receives 5 daily chances (lives) to investigate and pass levels. Finding the correct city location protects your life and clears the level!'
+                    : 'Setiap hari, setiap detektif dibekali 5 kesempatan harian (nyawa). Menemukan kota lokasi yang tepat akan menjaga nyawamu tetap aman dan meluluskan level!'}
                 </p>
               </div>
             </div>
@@ -360,24 +360,24 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
 
               {/* Rule 2 */}
               <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-start gap-3">
-                <div className="w-7 h-7 rounded-xl bg-rose-500/20 text-rose-400 font-bold font-mono text-xs flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold font-mono text-xs flex items-center justify-center shrink-0">
                   2
                 </div>
                 <div>
                   <h5 className="text-xs font-bold text-white mb-0.5">
-                    {lang === 'en' ? 'Passing Threshold (≥ 3,000 Pts)' : 'Batas Skor Minimum Lulus (≥ 3.000 Poin)'}
+                    {lang === 'en' ? 'Location Accuracy & Level Pass (≥ 3,000 Pts)' : 'Akurasi Lokasi & Syarat Lulus Level (≥ 3.000 Poin)'}
                   </h5>
                   <p className="text-xs text-slate-400 leading-snug">
                     {lang === 'en'
-                      ? 'Achieving ≥ 3,000 pts (at least 1 Star) successfully clears the level and immediately unlocks the next mystery city for you to explore.'
-                      : 'Meraih skor minimal 3.000 poin (1 Bintang) meluluskan level tersebut dan otomatis membuka kota misteri berikutnya.'}
+                      ? 'Finding the correct city/region (distance ≤ 750 km, score ≥ 3,000 pts) awards at least 1 Star ⭐ and immediately unlocks the next mystery case. A closer year deduction earns 2 to 3 full stars!'
+                      : 'Menemukan kota/wilayah yang tepat (jarak ≤ 750 km, skor ≥ 3.000 poin) langsung meluluskan level (minimal 1 Bintang ⭐) dan membuka kasus berikutnya. Tebakan tahun yang semakin mendekati akan menambah bintang menjadi 2 hingga 3 bintang penuh!'}
                   </p>
                 </div>
               </div>
 
               {/* Rule 3 */}
               <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-start gap-3">
-                <div className="w-7 h-7 rounded-xl bg-orange-500/20 text-orange-400 font-bold font-mono text-xs flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 rounded-xl bg-rose-500/20 text-rose-400 font-bold font-mono text-xs flex items-center justify-center shrink-0">
                   3
                 </div>
                 <div>
@@ -386,8 +386,8 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
                   </h5>
                   <p className="text-xs text-slate-400 leading-snug">
                     {lang === 'en'
-                      ? 'If your answer score is below 3,000 pts, you fail the attempt and lose 1 life. If you lose all 3 lives (0/3), you must wait until midnight (00:00) when lives reset!'
-                      : 'Jika skormu di bawah 3.000 poin, tebakanmu gagal dan nyawamu berkurang 1. Bila seluruh 3 nyawa habis (0/3), kamu harus menunggu reset tengah malam (00:00) untuk menebak lagi!'}
+                      ? 'If you guess a completely wrong region/continent (> 750 km away) or your score is below 3,000 pts, you fail the attempt and lose 1 life (-1). If you lose all 5 lives (0/5), you must wait until midnight (00:00) when lives reset!'
+                      : 'Jika tebakan meleset jauh (> 750 km dari kota target) atau total skor di bawah 3.000 poin, percobaanmu gagal dan nyawa berkurang 1 (-1). Bila seluruh 5 nyawa habis (0/5), kesempatan akan di-reset penuh kembali pada tengah malam (00:00)!'}
                   </p>
                 </div>
               </div>
@@ -420,12 +420,12 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
               <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800">
                 <span className="text-xs font-mono text-rose-400 uppercase font-bold flex items-center gap-1.5 mb-1">
                   <Compass className="w-3.5 h-3.5" />
-                  {lang === 'en' ? 'Location Accuracy (Max 5,000 Pts)' : 'Akurasi Lokasi Peta (Maks 5.000 Pts)'}
+                  {lang === 'en' ? 'City Location Accuracy (Max 5,000 Pts)' : 'Akurasi Deduksi Kota (Maks 5.000 Pts)'}
                 </span>
                 <p className="text-xs text-slate-300 leading-relaxed">
                   {lang === 'en'
-                    ? 'Strict exponential curve. Pin < 50m: 5,000 pts. Pin ~10km: ~4,850 pts. Pin ~100km: ~3,750 pts. Pin ~500km: ~1,200 pts. Pin >= 2,000km: 0 pts.'
-                    : 'Kurva peluruhan ketat. Pin < 50m: 5.000 pts. Pin ~10km: ~4.850 pts. Pin ~100km: ~3.750 pts. Pin ~500km: ~1.200 pts. Pin >= 2.000km: 0 pts.'}
+                    ? 'Deduce & select the target city. Exact city center (< 10 km): ~4,850–5,000 pts. Radius ~100 km: ~3,750 pts. Radius ~500 km: ~1,200 pts. Missed city (> 750 km): round fails. Distance ≥ 2,000 km: 0 pts.'
+                    : 'Cari & pilih nama kota target. Tepat di pusat kota (< 10 km): ~4.850–5.000 pts. Radius ~100 km: ~3.750 pts. Radius ~500 km: ~1.200 pts. Meleset > 750 km: ronde gagal (salah kota). Jarak ≥ 2.000 km: 0 pts.'}
                 </p>
               </div>
 
@@ -436,8 +436,8 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
                 </span>
                 <p className="text-xs text-slate-300 leading-relaxed">
                   {lang === 'en'
-                    ? 'Exact year: 5,000 pts. 1 yr off: 3,500 pts. 2 yrs off: 2,000 pts. 3 yrs off: 1,000 pts. 4 yrs off: 400 pts. >= 5 yrs off: 0 pts.'
-                    : 'Tahun tepat: 5.000 pts. Selisih 1 thn: 3.500 pts. Selisih 2 thn: 2.000 pts. Selisih 3 thn: 1.000 pts. Selisih 4 thn: 400 pts. Selisih >= 5 thn: 0 pts.'}
+                    ? 'Exact year (Bullseye): 5,000 pts. 1 yr off: 3,500 pts. 2 yrs off: 2,000 pts. 3 yrs off: 1,000 pts. 4 yrs off: 400 pts. ≥ 5 yrs off: 0 pts.'
+                    : 'Tepat 100% (Bullseye): 5.000 pts. Selisih 1 thn: 3.500 pts. Selisih 2 thn: 2.000 pts. Selisih 3 thn: 1.000 pts. Selisih 4 thn: 400 pts. Selisih ≥ 5 thn: 0 pts.'}
                 </p>
               </div>
             </div>
@@ -446,34 +446,34 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
             <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800">
               <h4 className="text-xs font-bold text-white uppercase tracking-wider font-mono mb-3 flex items-center gap-2">
                 <Trophy className="w-4 h-4 text-amber-400" />
-                <span>{lang === 'en' ? 'Detective Rank Grades (Peringkat Hasil Ronde)' : 'Peringkat Hasil Ronde'}</span>
+                <span>{lang === 'en' ? 'Detective Rank Grades & Stars' : 'Peringkat Ronde, Bintang & Hadiah Koin'}</span>
               </h4>
 
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs">
                 <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30">
                   <span className="text-lg font-black font-mono text-amber-400 block">👑 Rank S</span>
                   <span className="text-[11px] text-white font-bold block mt-0.5">≥ 9.000 pts</span>
-                  <span className="text-[10px] text-amber-300/80 block mt-1">+200 Koin Bonus</span>
+                  <span className="text-[10px] text-amber-300/80 block mt-1">⭐⭐⭐ (+200 Koin)</span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
                   <span className="text-lg font-black font-mono text-emerald-400 block">🥇 Rank A</span>
                   <span className="text-[11px] text-white font-bold block mt-0.5">7.500–8.999</span>
-                  <span className="text-[10px] text-emerald-300/80 block mt-1">+100 Koin Bonus</span>
+                  <span className="text-[10px] text-emerald-300/80 block mt-1">⭐⭐⭐ (+100 Koin)</span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/30">
                   <span className="text-lg font-black font-mono text-blue-400 block">🥈 Rank B</span>
                   <span className="text-[11px] text-white font-bold block mt-0.5">5.500–7.499</span>
-                  <span className="text-[10px] text-blue-300/80 block mt-1">Lulus Mantap</span>
+                  <span className="text-[10px] text-blue-300/80 block mt-1">⭐⭐ Lulus Mantap</span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/30">
                   <span className="text-lg font-black font-mono text-indigo-400 block">🥉 Rank C</span>
                   <span className="text-[11px] text-white font-bold block mt-0.5">3.000–5.499</span>
-                  <span className="text-[10px] text-indigo-300/80 block mt-1">Lulus Cukup</span>
+                  <span className="text-[10px] text-indigo-300/80 block mt-1">⭐ Lulus Cukup</span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
                   <span className="text-lg font-black font-mono text-slate-400 block">🔍 Rank D</span>
                   <span className="text-[11px] text-slate-300 font-bold block mt-0.5">&lt; 3.000 pts</span>
-                  <span className="text-[10px] text-rose-400 block mt-1">Perlu Latihan</span>
+                  <span className="text-[10px] text-rose-400 block mt-1">❌ Gagal (-1 Nyawa)</span>
                 </div>
               </div>
             </div>
@@ -483,12 +483,12 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
               <ShoppingBag className="w-6 h-6 text-indigo-400 shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-sm font-bold text-white mb-1">
-                  {lang === 'en' ? 'Chrono Shop: Equip Real Retro Lenses' : 'Toko Penjelajah: Gunakan Lensa Kamera Retro Asli'}
+                  {lang === 'en' ? 'Chrono Shop: Retro Lenses, HUD Themes & Gadgets' : 'Toko Penjelajah: Lensa Retro, Tema HUD & Gadget'}
                 </h4>
                 <p className="text-xs text-slate-300 leading-relaxed">
                   {lang === 'en'
-                    ? 'Use your earned Chrono Coins to purchase and equip vintage filters. The VHS 90s Lens displays real CRT scanlines and OSD recording counters on your photo screen, while the Sepia 70s Lens adds a warm nostalgic film vignette!'
-                    : 'Gunakan Koin Penjelajah yang kamu kumpulkan untuk membeli dan memasang lensa kamera antik. Lensa VHS 90-an menampilkan scanlines TV tabung analog & timestamp REC nyata di layar foto, sedangkan Lensa Sepia 70-an memberikan nuansa album foto nostalgia!'}
+                    ? 'Use earned Chrono Coins in the Passport & Shop to unlock visual gear: Retro Camera Lenses (VHS 90s CRT scanlines, Sepia 70s vintage film warmth), Map HUD Themes (Antique Maritime Gold Compass, Cyberpunk Neon), and Gadgets like the Time Shift Chronometer (scans archival anomalies & narrows target year)!'
+                    : 'Gunakan Koin Penjelajah di menu Paspor & Toko untuk membuka perlengkapan: Lensa Kamera Retro (VHS 90-an efek scanlines TV tabung analog, Sepia 70-an warna album foto antik), Tema HUD Peta (Kompas Emas Maritim, Neon Cyberpunk), serta Gadget Kronometer Waktu (memindai anomali tahun arsip)!'}
                 </p>
               </div>
             </div>

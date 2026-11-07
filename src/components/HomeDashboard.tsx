@@ -250,8 +250,14 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   Object.keys(playerProgress?.levels || {}).forEach((lvlStr) => {
     const lvl = parseInt(lvlStr, 10);
     const challenge = getChallengeByLevel(lvl);
-    if (challenge?.country && challenge.country.trim()) {
-      countrySet.add(challenge.country.trim().toLowerCase());
+    if (challenge?.country) {
+      const cName =
+        typeof challenge.country === 'string'
+          ? challenge.country
+          : challenge.country.id || challenge.country.en || '';
+      if (cName && typeof cName === 'string' && cName.trim()) {
+        countrySet.add(cName.trim().toLowerCase());
+      }
     }
   });
 

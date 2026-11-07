@@ -329,7 +329,10 @@ export function getExploredLocations(
         addedLevels.add(lvlNum);
         const challenge = getChallengeByLevel(lvlNum);
         if (challenge) {
-          const countryName = challenge.country.id;
+          const countryName =
+            typeof challenge.country === 'string'
+              ? challenge.country
+              : (challenge.country?.id || challenge.country?.en || '');
           const meta = getCountryMeta(countryName);
           results.push({
             level: lvlNum,

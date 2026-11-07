@@ -30,8 +30,9 @@ import {
   List,
   Edit3,
   Check,
+  HelpCircle,
 } from 'lucide-react';
-import { PlayerProgress, PlayerRank, DailyChances } from '../utils/progress';
+import { PlayerProgress, PlayerRank, DailyChances, IndonesiaProgress } from '../utils/progress';
 import { GamificationState } from '../utils/gamification';
 import { Language, TRANSLATIONS, RegionId } from '../utils/i18n';
 import { HistoricalPano, getChallengeByLevel } from '../data/challenges';
@@ -67,6 +68,7 @@ interface HomeDashboardProps {
   onOpenHowToPlay: () => void;
   onOpenClaimGelar?: () => void;
   onOpenWaitlist?: () => void;
+  indonesiaProgress?: IndonesiaProgress;
 }
 
 /**
@@ -176,6 +178,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   onOpenHowToPlay,
   onOpenClaimGelar,
   onOpenWaitlist,
+  indonesiaProgress,
 }) => {
   const isEn = lang === 'en';
   const t = TRANSLATIONS[lang];
@@ -227,9 +230,37 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
   const currentLevelNumber = playerProgress?.unlockedLevel || 1;
   const rankAsset = getRankAssetByStars(playerProgress?.totalStars || 0);
-  const casesCompleted = Object.keys(playerProgress?.levels || {}).length;
-  // Calculate unique countries from history or challenges safely
-  const uniqueCountriesCount = Math.max(4, new Set((gamification?.history || []).map(h => h?.city).filter(Boolean)).size);
+
+  // Calculate actual total cases completed (Campaign 100 + Indonesia 50)
+  const campaignCasesCount = Object.keys(playerProgress?.levels || {}).length;
+  const indoCasesCount = Object.keys(indonesiaProgress?.cases || {}).length;
+  const casesCompleted = campaignCasesCount + indoCasesCount;
+
+  // Calculate actual unique countries discovered strictly from player's played history and completed cases
+  const countrySet = new Set<string>();
+
+  // 1. From game history (record of every played round)
+  (gamification?.history || []).forEach((h) => {
+    if (h?.country && typeof h.country === 'string' && h.country.trim()) {
+      countrySet.add(h.country.trim().toLowerCase());
+    }
+  });
+
+  // 2. From completed campaign levels
+  Object.keys(playerProgress?.levels || {}).forEach((lvlStr) => {
+    const lvl = parseInt(lvlStr, 10);
+    const challenge = getChallengeByLevel(lvl);
+    if (challenge?.country && challenge.country.trim()) {
+      countrySet.add(challenge.country.trim().toLowerCase());
+    }
+  });
+
+  // 3. From completed Indonesia cases
+  if (indoCasesCount > 0) {
+    countrySet.add('indonesia');
+  }
+
+  const uniqueCountriesCount = countrySet.size;
   const activeChallenge = currentChallenge || getChallengeByLevel(currentLevelNumber);
 
   // Dynamically load strictly explored locations from player history & completed levels
@@ -338,16 +369,16 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           </div>
 
           {/* Streamlined Navigation Links */}
-          <nav className="hidden xl:flex items-center gap-2 text-xs font-semibold">
+          <nav className="hidden lg:flex items-center gap-2 text-xs font-semibold">
             <button
               onClick={() => {
-                setActiveNav('ekspedisi');
-                document.getElementById('modes-grid')?.scrollIntoView({ behavior: 'smooth' });
+                soundManager.playModalOpen();
+                onOpenHowToPlay();
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-transparent text-slate-400 hover:text-amber-300 hover:bg-slate-800/40 transition cursor-pointer"
             >
-              <Compass className="w-3.5 h-3.5 text-blue-400" />
-              <span>{isEn ? 'Game Modes' : 'Mode Permainan'}</span>
+              <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
+              <span>{isEn ? 'How to Play' : 'Cara Bermain'}</span>
             </button>
 
             <button
@@ -629,7 +660,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               </div>
               <div>
                 <span className="text-sm sm:text-base font-black text-white block leading-none">
-                  {casesCompleted || 3}
+                  {casesCompleted}
                 </span>
                 <span className="text-[10px] text-slate-400">{isEn ? 'Cases Completed' : 'Kasus Selesai'}</span>
               </div>

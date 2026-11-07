@@ -283,8 +283,8 @@ export function getCityImageUrl(levelNumber: number): string {
 
 /**
  * Build dynamic list for "Lokasi Terakhir yang Dijelajahi" carousel:
- * STRICTLY uses player's actual completed history or campaign levels.
- * Unexplored locations will NOT be included until the player finishes them.
+ * STRICTLY uses player's actual completed 100-case campaign adventure levels.
+ * Non-campaign modes (expedition, daily, indonesia) are excluded.
  */
 export function getExploredLocations(
   history: GameHistoryEntry[] = [],
@@ -293,29 +293,20 @@ export function getExploredLocations(
   const results: ExploredLocationCard[] = [];
   const addedLevels = new Set<number>();
 
-  // 1. First, include player's actual played history (newest first)
+  // 1. First, include player's actual completed campaign history (newest first)
   if (Array.isArray(history) && history.length > 0) {
     const sortedHistory = [...history].reverse();
     for (const h of sortedHistory) {
+      // STRICT: Only include 100-case campaign adventure mode
+      if (h.mode !== 'campaign') continue;
+
       const lvlNum = h.levelNumber;
-      if (lvlNum && !addedLevels.has(lvlNum)) {
+      if (lvlNum && lvlNum >= 1 && lvlNum <= 100 && !addedLevels.has(lvlNum)) {
         addedLevels.add(lvlNum);
         const meta = getCountryMeta(h.country);
         results.push({
           level: lvlNum,
           image: getCityImageUrl(lvlNum),
-          city: h.city,
-          country: h.country,
-          countryCode: meta.code,
-          flag: meta.flag,
-          year: h.targetYear || 2010,
-        });
-      } else if (!lvlNum && h.city) {
-        // Fallback for expedition mode without levelNumber
-        const meta = getCountryMeta(h.country);
-        results.push({
-          level: 1,
-          image: getCityImageUrl(1),
           city: h.city,
           country: h.country,
           countryCode: meta.code,
@@ -354,6 +345,6 @@ export function getExploredLocations(
     }
   }
 
-  // Strictly return only explored locations!
+  // Strictly return only 100-case campaign explored locations!
   return results;
 }

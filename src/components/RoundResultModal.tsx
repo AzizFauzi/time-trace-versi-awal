@@ -1,7 +1,14 @@
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { HistoricalPano } from '../data/challenges';
-import { formatDistance, calculateHaversineDistanceKm, MINIMUM_PASS_SCORE } from '../utils/scoring';
+import {
+  formatDistance,
+  calculateHaversineDistanceKm,
+  MINIMUM_PASS_SCORE,
+  checkRoundPassed,
+  PassFailureReason,
+} from '../utils/scoring';
+import { calculateStars } from '../utils/progress';
 import { POPULAR_CITIES } from '../utils/citiesDatabase';
 import { Achievement, calculateGrade } from '../utils/gamification';
 import {
@@ -58,6 +65,8 @@ interface RoundResultModalProps {
   coinsEarned?: number;
   newAchievements?: Achievement[];
   grade?: 'S' | 'A' | 'B' | 'C' | 'D';
+  isLevelPassed?: boolean;
+  passReason?: PassFailureReason;
   onOpenPassport?: () => void;
   onOpenWaitlist?: () => void;
 }
@@ -89,6 +98,8 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
   coinsEarned = 0,
   newAchievements = [],
   grade: explicitGrade,
+  isLevelPassed: propIsLevelPassed,
+  passReason: propPassReason,
   onOpenPassport,
   onOpenWaitlist,
 }) => {
@@ -112,25 +123,30 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
   // Nearest city from POPULAR_CITIES
   const nearestCity = guessedLocation
     ? POPULAR_CITIES.map((c) => ({
-        city: c,
-        dist: calculateHaversineDistanceKm(guessedLocation.lat, guessedLocation.lng, c.lat, c.lng),
-      })).sort((a, b) => a.dist - b.dist)[0]
+      city: c,
+      dist: calculateHaversineDistanceKm(guessedLocation.lat, guessedLocation.lng, c.lat, c.lng),
+    })).sort((a, b) => a.dist - b.dist)[0]
     : null;
 
   const locationGuessLabel = isNearTarget
     ? `${challenge.city} (${guessedCoordsStr || ''})`
     : nearestCity && nearestCity.dist <= 60
-    ? `${nearestCity.city.name} (${guessedCoordsStr || ''})`
-    : guessedCoordsStr
-    ? `${guessedCoordsStr}`
-    : (lang === 'en' ? 'Location Pin Placed' : 'Pin Lokasi Diletakkan');
+      ? `${nearestCity.city.name} (${guessedCoordsStr || ''})`
+      : guessedCoordsStr
+        ? `${guessedCoordsStr}`
+        : (lang === 'en' ? 'Location Pin Placed' : 'Pin Lokasi Diletakkan');
 
   const roundGrade = explicitGrade || calculateGrade(roundTotalScore);
-  const isLevelPassed = roundTotalScore >= MINIMUM_PASS_SCORE;
+
+  // Strict evaluation: Must meet minimum score AND not completely miss location or year
+  const computedPass = checkRoundPassed(roundTotalScore, locationScore, yearScore, distanceKm, yearDiff);
+  const isLevelPassed = typeof propIsLevelPassed === 'boolean' ? propIsLevelPassed : computedPass.passed;
+  const passReason = propPassReason || computedPass.reason;
+  const effectiveStars = isLevelPassed ? Math.max(1, starsEarned || calculateStars(roundTotalScore)) : 0;
 
   useEffect(() => {
-    // Confetti celebration if score is awesome (> 7000 or 3 stars or level passed)
-    if (roundTotalScore >= 7000 || isGameOver || (gameMode === 'campaign' && isLevelPassed)) {
+    // Confetti celebration strictly only if the round/level was actually passed!
+    if (isLevelPassed && (roundTotalScore >= 6000 || isGameOver)) {
       confetti({
         particleCount: roundTotalScore >= 8000 ? 100 : 60,
         spread: 75,
@@ -138,7 +154,7 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
         colors: ['#f59e0b', '#10b981', '#06b6d4', '#ec4899'],
       });
     }
-  }, [roundTotalScore, isGameOver, gameMode, isLevelPassed]);
+  }, [roundTotalScore, isGameOver, isLevelPassed]);
 
   const generateShareText = () => {
     return gameMode === 'campaign' && levelNumber
@@ -160,7 +176,7 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}&quote=${encodeURIComponent(text)}`, '_blank');
     } else if (platform === 'instagram') {
       if (navigator.share) {
-        navigator.share({ title: 'Time Trace', text, url: currentUrl }).catch(() => {});
+        navigator.share({ title: 'Time Trace', text, url: currentUrl }).catch(() => { });
       } else {
         navigator.clipboard.writeText(text + ' ' + currentUrl);
         alert(lang === 'en' ? 'Share text copied! Paste it in Instagram story.' : 'Teks dibagikan disalin ke clipboard! Buka Instagram untuk menempelkannya.');
@@ -168,19 +184,15 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
     }
   };
 
-  // Default / fallback achievements shown in mockup
+  // Only display real unlocked achievements (NO fake mockup achievements)
   const displayAchievements = newAchievements && newAchievements.length > 0
     ? newAchievements.map(a => ({
-        id: a.id,
-        icon: a.icon,
-        title: a.title[lang],
-        coins: a.rewardCoins
-      }))
-    : [
-        { id: 'gps-human', icon: '👓', title: lang === 'en' ? 'Human GPS' : 'GPS Manusia', coins: 500 },
-        { id: 'archive-collector', icon: '📖', title: lang === 'en' ? 'True Archive Collector' : 'Kolektor Arsip Sejati', coins: 800 },
-        { id: 'time-points', icon: '💎', title: lang === 'en' ? 'Wealth of Time Points' : 'Kaya Poin Waktu', coins: 1000 },
-      ];
+      id: a.id,
+      icon: a.icon,
+      title: a.title ? (a.title[lang] || a.title.id) : (a as any).name || 'Achievement',
+      coins: a.rewardCoins || 0
+    }))
+    : [];
 
   const polaroidImageSrc = challenge.city.toLowerCase().includes('singapore')
     ? '/assets/polaroid_singapore.jpg'
@@ -189,7 +201,7 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto">
       {/* Main Modal Card with Gambar 3 Background Artwork */}
-      <div 
+      <div
         className="relative w-full max-w-[540px] my-auto rounded-[2.2rem] border border-cyan-500/40 shadow-[0_0_50px_rgba(6,182,212,0.25)] text-white overflow-hidden max-h-[94vh] flex flex-col"
         style={{
           backgroundImage: "url('/assets/result_bg.jpg')",
@@ -218,10 +230,10 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
           {/* 1. Header: Logo & Level Tag */}
           <div className="text-center pt-1 mb-3">
             {/* Existing TimeTrace Logo */}
-            <img 
-              src="/logo.png" 
-              alt="Time Trace" 
-              className="h-20 sm:h-24 w-auto object-contain mx-auto drop-shadow-[0_0_22px_rgba(245,158,11,0.55)] transition hover:scale-105 duration-300" 
+            <img
+              src="/logo.png"
+              alt="Time Trace"
+              className="h-20 sm:h-24 w-auto object-contain mx-auto drop-shadow-[0_0_22px_rgba(245,158,11,0.55)] transition hover:scale-105 duration-300"
             />
 
             {/* Level Pill */}
@@ -233,12 +245,12 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
                     ? `CAMPAIGN • LEVEL ${levelNumber} OF 100`
                     : `PETUALANGAN • LEVEL ${levelNumber} DARI 100`
                   : gameMode === 'indonesia' && levelNumber
-                  ? lang === 'en'
-                    ? `EXPLORE INDONESIA • CASE ${levelNumber} OF 50`
-                    : `JELAJAH INDONESIA • KASUS ${levelNumber} DARI 50`
-                  : isGameOver
-                  ? t.gameOverHeader
-                  : t.roundResultHeader(roundNumber, totalRounds)}
+                    ? lang === 'en'
+                      ? `EXPLORE INDONESIA • CASE ${levelNumber} OF 50`
+                      : `JELAJAH INDONESIA • KASUS ${levelNumber} DARI 50`
+                    : isGameOver
+                      ? t.gameOverHeader
+                      : t.roundResultHeader(roundNumber, totalRounds)}
               </span>
             </div>
 
@@ -257,11 +269,10 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
               {[1, 2, 3].map((starIdx) => (
                 <Star
                   key={starIdx}
-                  className={`w-7 h-7 sm:w-8 sm:h-8 transition-all duration-300 ${
-                    starIdx <= starsEarned
+                  className={`w-7 h-7 sm:w-8 sm:h-8 transition-all duration-300 ${starIdx <= effectiveStars
                       ? 'text-amber-400 fill-amber-400 drop-shadow-[0_0_14px_rgba(251,191,36,0.9)] animate-pulse'
                       : 'text-slate-600/80 stroke-[1.5]'
-                  }`}
+                    }`}
                 />
               ))}
             </div>
@@ -277,12 +288,14 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
               </div>
               <div className="text-left">
                 <div className="text-base sm:text-lg font-black text-white tracking-wider leading-tight">
-                  {lang === 'en' ? 'LEVEL CLEARED!' : 'LEVEL LULUS!'}
+                  {gameMode === 'campaign' || gameMode === 'indonesia'
+                    ? (lang === 'en' ? 'LEVEL CLEARED!' : 'LEVEL LULUS!')
+                    : (lang === 'en' ? 'ROUND PASSED!' : 'RONDE LULUS!')}
                 </div>
                 <div className="text-xs text-teal-200/90 font-medium">
                   {unlockedNextLevel
                     ? (lang === 'en' ? 'Next level unlocked!' : 'Level berikutnya terbuka!')
-                    : (lang === 'en' ? 'Deduction cleared!' : 'Level berikutnya terbuka!')}
+                    : (lang === 'en' ? 'Deduction passed!' : 'Tebakan berhasil!')}
                 </div>
               </div>
             </div>
@@ -293,12 +306,18 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
               </div>
               <div className="text-left">
                 <div className="text-base sm:text-lg font-black text-rose-100 tracking-wider leading-tight">
-                  {lang === 'en' ? 'LEVEL FAILED!' : 'LEVEL BELUM LOLOS!'}
+                  {gameMode === 'campaign' || gameMode === 'indonesia'
+                    ? (lang === 'en' ? 'LEVEL FAILED!' : 'LEVEL BELUM LOLOS!')
+                    : (lang === 'en' ? 'ROUND FAILED!' : 'RONDE BELUM LOLOS!')}
                 </div>
                 <div className="text-xs text-rose-300 font-medium">
-                  {lang === 'en'
-                    ? `Need ≥ ${MINIMUM_PASS_SCORE.toLocaleString(locale)} pts to pass.`
-                    : `Butuh minimal ${MINIMUM_PASS_SCORE.toLocaleString(locale)} pts untuk lulus.`}
+                  {passReason === 'location_miss'
+                    ? (lang === 'en' ? 'Location missed! Too far from target (> 1,500 km).' : 'Lokasi meleset! Jarak pin terlalu jauh (> 1.500 km).')
+                    : passReason === 'year_miss'
+                      ? (lang === 'en' ? 'Year missed! Chronology off by ≥ 5 years.' : 'Tahun meleset! Kronologi selisih ≥ 5 tahun.')
+                      : (lang === 'en'
+                        ? `Need ≥ ${MINIMUM_PASS_SCORE.toLocaleString(locale)} pts to pass.`
+                        : `Butuh minimal ${MINIMUM_PASS_SCORE.toLocaleString(locale)} pts untuk lulus.`)}
                 </div>
               </div>
             </div>
@@ -307,12 +326,10 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
           {/* 3. Status Badges Row (3 columns) */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
             {/* Shield / Life Safe or Life Lost */}
-            <div className={`rounded-xl p-2.5 border backdrop-blur-sm flex items-center gap-2.5 text-left shadow-sm ${
-              isLevelPassed ? 'border-teal-500/40 bg-teal-950/40' : 'border-rose-500/40 bg-rose-950/40'
-            }`}>
-              <div className={`p-1.5 rounded-lg shrink-0 ${
-                isLevelPassed ? 'bg-teal-500/20 text-teal-300' : 'bg-rose-500/20 text-rose-300'
+            <div className={`rounded-xl p-2.5 border backdrop-blur-sm flex items-center gap-2.5 text-left shadow-sm ${isLevelPassed ? 'border-teal-500/40 bg-teal-950/40' : 'border-rose-500/40 bg-rose-950/40'
               }`}>
+              <div className={`p-1.5 rounded-lg shrink-0 ${isLevelPassed ? 'bg-teal-500/20 text-teal-300' : 'bg-rose-500/20 text-rose-300'
+                }`}>
                 {isLevelPassed ? (
                   <ShieldCheck className="w-4 h-4 text-teal-400" />
                 ) : (
@@ -333,11 +350,10 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
             </div>
 
             {/* Remaining Chances / Lives */}
-            <div className={`rounded-xl p-2.5 border backdrop-blur-sm flex items-center gap-2.5 text-left shadow-sm ${
-              typeof chancesRemaining === 'number' && chancesRemaining <= 0
+            <div className={`rounded-xl p-2.5 border backdrop-blur-sm flex items-center gap-2.5 text-left shadow-sm ${typeof chancesRemaining === 'number' && chancesRemaining <= 0
                 ? 'border-rose-600/70 bg-rose-950/60 ring-1 ring-rose-500/50'
                 : 'border-rose-500/40 bg-rose-950/40'
-            }`}>
+              }`}>
               <div className="p-1.5 rounded-lg bg-rose-500/20 text-rose-300 shrink-0">
                 <Heart className={`w-4 h-4 ${typeof chancesRemaining === 'number' && chancesRemaining <= 0 ? 'text-slate-500' : 'fill-rose-500 text-rose-500'}`} />
               </div>
@@ -357,39 +373,41 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
                 <Coins className="w-4 h-4 text-amber-400" />
               </div>
               <div className="text-xs sm:text-sm font-mono font-black text-amber-300">
-                +{coinsEarned > 0 ? coinsEarned.toLocaleString(locale) : '500'} {lang === 'en' ? 'Coins' : 'Koin'}
+                +{coinsEarned.toLocaleString(locale)} {lang === 'en' ? 'Coins' : 'Koin'}
               </div>
             </div>
           </div>
 
-          {/* 4. Prestasi Baru Terbuka (Achievements Box) */}
-          <div className="mt-3 rounded-2xl border border-amber-400/60 bg-amber-950/20 backdrop-blur-sm p-3 relative overflow-hidden shadow-md">
-            {/* Background Stamp Watermark */}
-            <div className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none opacity-15 text-amber-400">
-              <svg className="w-20 h-20" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="50" cy="50" r="45" strokeDasharray="4 2" />
-                <circle cx="50" cy="50" r="38" />
-                <path d="M50 15 L53 35 L70 25 L60 42 L80 50 L60 58 L70 75 L53 65 L50 85 L47 65 L30 75 L40 58 L20 50 L40 42 L30 25 L47 35 Z" strokeWidth="1.5" />
-              </svg>
-            </div>
+          {/* 4. Prestasi Baru Terbuka (Achievements Box) - STRICTLY ONLY IF UNLOCKED */}
+          {displayAchievements.length > 0 && (
+            <div className="mt-3 rounded-2xl border border-amber-400/60 bg-amber-950/20 backdrop-blur-sm p-3 relative overflow-hidden shadow-md">
+              {/* Background Stamp Watermark */}
+              <div className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none opacity-15 text-amber-400">
+                <svg className="w-20 h-20" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="50" cy="50" r="45" strokeDasharray="4 2" />
+                  <circle cx="50" cy="50" r="38" />
+                  <path d="M50 15 L53 35 L70 25 L60 42 L80 50 L60 58 L70 75 L53 65 L50 85 L47 65 L30 75 L40 58 L20 50 L40 42 L30 25 L47 35 Z" strokeWidth="1.5" />
+                </svg>
+              </div>
 
-            {/* Achievement Header */}
-            <div className="text-xs font-mono uppercase text-amber-400 font-bold tracking-wider mb-2 flex items-center justify-center gap-1.5">
-              <Trophy className="w-4 h-4 text-amber-400" />
-              <span>{lang === 'en' ? 'NEW ACHIEVEMENTS UNLOCKED!' : 'PRESTASI BARU TERBUKA!'}</span>
-            </div>
+              {/* Achievement Header */}
+              <div className="text-xs font-mono uppercase text-amber-400 font-bold tracking-wider mb-2 flex items-center justify-center gap-1.5">
+                <Trophy className="w-4 h-4 text-amber-400" />
+                <span>{lang === 'en' ? 'NEW ACHIEVEMENTS UNLOCKED!' : 'PRESTASI BARU TERBUKA!'}</span>
+              </div>
 
-            {/* Achievement Items */}
-            <div className="space-y-1.5 relative z-10">
-              {displayAchievements.map((item) => (
-                <div key={item.id} className="text-xs text-white font-bold flex items-center justify-center gap-2">
-                  <span className="text-sm">{item.icon}</span>
-                  <span className="text-slate-100">{item.title}</span>
-                  <span className="text-amber-400 font-mono text-[11px] font-semibold">(+{item.coins} Koin)</span>
-                </div>
-              ))}
+              {/* Achievement Items */}
+              <div className="space-y-1.5 relative z-10">
+                {displayAchievements.map((item) => (
+                  <div key={item.id} className="text-xs text-white font-bold flex items-center justify-center gap-2">
+                    <span className="text-sm">{item.icon}</span>
+                    <span className="text-slate-100">{item.title}</span>
+                    <span className="text-amber-400 font-mono text-[11px] font-semibold">(+{item.coins} Koin)</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* 5. Jawaban Yang Anda Submit (Answer Breakdown) */}
           <div className="mt-4">
@@ -410,9 +428,8 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
                       <Calendar className="w-3.5 h-3.5 text-amber-400" />
                       {lang === 'en' ? 'Your Year Guess:' : 'Tebakan Tahun Anda:'}
                     </span>
-                    <span className={`font-mono text-[10px] px-2 py-0.5 rounded-md font-bold border border-slate-700 ${
-                      yearDiff === 0 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-slate-800/90 text-slate-300'
-                    }`}>
+                    <span className={`font-mono text-[10px] px-2 py-0.5 rounded-md font-bold border border-slate-700 ${yearDiff === 0 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-slate-800/90 text-slate-300'
+                      }`}>
                       {yearDiff === 0
                         ? (lang === 'en' ? 'Exact Match!' : 'Tepat!')
                         : (lang === 'en' ? `Diff: ${yearDiff} yrs` : `Selisih: ${yearDiff} thn`)}
@@ -546,7 +563,7 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
             <div className="w-32 sm:w-36 shrink-0 bg-white p-2 pb-3.5 rounded-sm shadow-xl transform rotate-3 hover:rotate-0 transition-transform duration-300 relative border border-slate-300/40">
               {/* Scotch Tape Graphic at Top */}
               <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-10 h-4 bg-amber-100/70 border border-white/40 shadow-xs rotate-[-3deg] pointer-events-none" />
-              
+
               {/* Archival Photo */}
               <img
                 src={polaroidImageSrc}
@@ -581,7 +598,7 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
                 title="Bagikan ke WhatsApp"
               >
                 <svg className="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
-                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.969.585 1.961.947 3.24.947 3.182 0 5.768-2.586 5.768-5.766 0-3.18-2.586-5.766-5.768-5.766zm9.969 5.766c0 5.514-4.486 10-10 10-1.802 0-3.488-.479-4.946-1.312l-5.054 1.376 1.398-4.939c-.939-1.503-1.488-3.275-1.488-5.125 0-5.514 4.486-10 10-10s10 4.486 10 10z"/>
+                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.969.585 1.961.947 3.24.947 3.182 0 5.768-2.586 5.768-5.766 0-3.18-2.586-5.766-5.768-5.766zm9.969 5.766c0 5.514-4.486 10-10 10-1.802 0-3.488-.479-4.946-1.312l-5.054 1.376 1.398-4.939c-.939-1.503-1.488-3.275-1.488-5.125 0-5.514 4.486-10 10-10s10 4.486 10 10z" />
                 </svg>
                 <span>WhatsApp</span>
               </button>
@@ -593,7 +610,7 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
                 title="Bagikan ke Instagram"
               >
                 <svg className="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.13-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.13-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                 </svg>
                 <span>Instagram</span>
               </button>
@@ -605,7 +622,7 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
                 title="Bagikan ke X"
               >
                 <svg className="w-3.5 h-3.5 fill-white shrink-0" viewBox="0 0 24 24">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
                 <span>X</span>
               </button>
@@ -617,7 +634,7 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
                 title="Bagikan ke Facebook"
               >
                 <svg className="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
                 <span>Facebook</span>
               </button>

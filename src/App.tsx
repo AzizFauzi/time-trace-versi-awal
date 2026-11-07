@@ -7,7 +7,14 @@ import {
   getChallengesByRegion,
   getChallengeByLevel,
 } from './data/challenges';
-import { calculateHaversineDistanceKm, calculateLocationScore, calculateYearScore, MINIMUM_PASS_SCORE } from './utils/scoring';
+import {
+  calculateHaversineDistanceKm,
+  calculateLocationScore,
+  calculateYearScore,
+  MINIMUM_PASS_SCORE,
+  checkRoundPassed,
+  PassFailureReason,
+} from './utils/scoring';
 import { SimpleStreetView } from './components/SimpleStreetView';
 import { LeafletGuessMap as GuessMap } from './components/LeafletGuessMap';
 import { YearPickerTimeline } from './components/YearPickerTimeline';
@@ -206,6 +213,8 @@ export default function App() {
   const [lastStarsEarned, setLastStarsEarned] = useState<number>(0);
   const [unlockedNextLevel, setUnlockedNextLevel] = useState<boolean>(false);
   const [lostLifeThisRound, setLostLifeThisRound] = useState<boolean>(false);
+  const [lastRoundPassed, setLastRoundPassed] = useState<boolean>(false);
+  const [lastPassReason, setLastPassReason] = useState<PassFailureReason | undefined>(undefined);
 
   // Gamification Round Reward Data
   const [lastEarnedCoins, setLastEarnedCoins] = useState<number>(0);
@@ -381,7 +390,12 @@ export default function App() {
     const roundTotal = locScore + yrScore;
     const yrDiff = Math.abs(selectedYear - currentChallenge.targetYear);
     const grade = calculateGrade(roundTotal);
-    const isLevelPassed = roundTotal >= MINIMUM_PASS_SCORE;
+
+    // Strict evaluation: Must meet minimum score AND not completely miss location or year
+    const passCheck = checkRoundPassed(roundTotal, locScore, yrScore, dist, yrDiff);
+    const isLevelPassed = passCheck.passed;
+    setLastRoundPassed(isLevelPassed);
+    setLastPassReason(passCheck.reason);
 
     setSubmittedLocation(selectedLocation);
     setCurrentDistanceKm(dist);
@@ -394,7 +408,7 @@ export default function App() {
     let nextLevelUnlocked = false;
     let didLoseLife = false;
 
-    // Deduct 1 life if score is below minimum points (MINIMUM_PASS_SCORE = 3000 pts)
+    // Deduct 1 life if deduction failed (below score or location/year missed)
     if (!isLevelPassed) {
       const updated = useDailyChance();
       setDailyChances(updated);
@@ -403,19 +417,32 @@ export default function App() {
 
     // If in campaign or indonesia mode:
     if ((gameMode === 'campaign' || gameMode === 'indonesia') && currentChallenge.levelNumber) {
-      if (gameMode === 'campaign') {
-        const saveRes = saveLevelScore(currentChallenge.levelNumber, roundTotal);
-        setLastStarsEarned(saveRes.starsEarned);
-        setUnlockedNextLevel(saveRes.unlockedNext);
-        nextLevelUnlocked = saveRes.unlockedNext;
-        setPlayerProgress(getPlayerProgress());
+      if (isLevelPassed) {
+        if (gameMode === 'campaign') {
+          const saveRes = saveLevelScore(currentChallenge.levelNumber, roundTotal);
+          setLastStarsEarned(saveRes.starsEarned);
+          setUnlockedNextLevel(saveRes.unlockedNext);
+          nextLevelUnlocked = saveRes.unlockedNext;
+          setPlayerProgress(getPlayerProgress());
+        } else {
+          const saveRes = saveIndonesiaCaseScore(currentChallenge.levelNumber, roundTotal);
+          setLastStarsEarned(saveRes.starsEarned);
+          setUnlockedNextLevel(saveRes.unlockedNext);
+          nextLevelUnlocked = saveRes.unlockedNext;
+          setIndonesiaProgress(getIndonesiaProgress());
+        }
       } else {
-        const saveRes = saveIndonesiaCaseScore(currentChallenge.levelNumber, roundTotal);
-        setLastStarsEarned(saveRes.starsEarned);
-        setUnlockedNextLevel(saveRes.unlockedNext);
-        nextLevelUnlocked = saveRes.unlockedNext;
-        setIndonesiaProgress(getIndonesiaProgress());
+        setLastStarsEarned(0);
+        setUnlockedNextLevel(false);
       }
+    } else {
+      // In quick expedition or daily challenge:
+      if (isLevelPassed) {
+        setLastStarsEarned(calculateStars(roundTotal));
+      } else {
+        setLastStarsEarned(0);
+      }
+      setUnlockedNextLevel(false);
     }
 
     setLostLifeThisRound(didLoseLife);
@@ -730,6 +757,7 @@ export default function App() {
             soundManager.playModalOpen();
             setIsPremiumWaitlistOpen(true);
           }}
+          indonesiaProgress={indonesiaProgress}
         />
 
         {/* Global Modals Accessible From Dashboard */}
@@ -1409,6 +1437,8 @@ export default function App() {
                 coinsEarned={lastEarnedCoins}
                 newAchievements={lastNewAchievements}
                 grade={lastRoundGrade}
+                isLevelPassed={lastRoundPassed}
+                passReason={lastPassReason}
                 onOpenPassport={() => openPassportModal('shop')}
                 onOpenWaitlist={() => setIsPremiumWaitlistOpen(true)}
               />

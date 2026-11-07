@@ -32,6 +32,43 @@ function toRad(degrees: number): number {
  */
 export const MINIMUM_PASS_SCORE = 3000;
 
+export type PassFailureReason = 'location_miss' | 'year_miss' | 'score_below_minimum';
+
+/**
+ * Evaluates whether a deduction passes the round/level:
+ * To pass, player must:
+ * 1. Reach the minimum total score (MINIMUM_PASS_SCORE = 3,000 pts out of 10,000 max)
+ * 2. NOT completely miss the location (locationScore must be > 0 and distanceKm <= 1,500 km)
+ * 3. NOT completely miss the year (yearScore must be > 0 and yearDiff <= 4 years)
+ */
+export function checkRoundPassed(
+  totalScore: number,
+  locationScore: number,
+  yearScore: number,
+  distanceKm: number,
+  yearDiff: number
+): {
+  passed: boolean;
+  reason?: PassFailureReason;
+} {
+  // If location is completely missed (> 1,500 km away or 0 location points):
+  if (distanceKm > 1500 || locationScore <= 0) {
+    return { passed: false, reason: 'location_miss' };
+  }
+
+  // If year is completely missed (off by 5+ years or 0 year points):
+  if (yearDiff >= 5 || yearScore <= 0) {
+    return { passed: false, reason: 'year_miss' };
+  }
+
+  // Total score must meet minimum passing score
+  if (totalScore < MINIMUM_PASS_SCORE) {
+    return { passed: false, reason: 'score_below_minimum' };
+  }
+
+  return { passed: true };
+}
+
 /**
  * Strict Location score: Max 5,000 points.
  * Steep exponential decay:

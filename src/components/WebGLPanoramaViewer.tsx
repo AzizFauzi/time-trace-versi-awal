@@ -52,6 +52,7 @@ export const WebGLPanoramaViewer: React.FC<WebGLPanoramaViewerProps> = ({
   // High-resolution photographic asset
   const photoAssetUrl =
     (challenge.id.startsWith('indo-') && challenge.levelNumber && INDONESIA_IMAGE_MAP[challenge.levelNumber]) ||
+    (challenge.id === 'indo-49-sentani-danau' && '/city-images/indo_danau_sentani.jpg') ||
     (challenge.id === 'indo-50-papua-danau-sentani' && '/city-images/indo_danau_sentani.jpg') ||
     (!challenge.id.startsWith('indo-') && challenge.levelNumber && LEVEL_IMAGE_MAP[challenge.levelNumber]) ||
     (challenge.panoId && apiKey

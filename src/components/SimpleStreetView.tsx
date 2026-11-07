@@ -37,7 +37,7 @@ export const SimpleStreetView: React.FC<SimpleStreetViewProps> = ({
     if (challenge.id.startsWith('indo-')) {
       if (challenge.levelNumber && INDONESIA_IMAGE_MAP[challenge.levelNumber]) {
         url = INDONESIA_IMAGE_MAP[challenge.levelNumber];
-      } else if (challenge.id === 'indo-50-papua-danau-sentani') {
+      } else if (challenge.id === 'indo-49-sentani-danau' || challenge.id === 'indo-50-papua-danau-sentani') {
         url = '/city-images/indo_danau_sentani.jpg';
       } else {
         url = '/city-images/L1_Jakarta.png';

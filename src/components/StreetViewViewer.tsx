@@ -34,6 +34,7 @@ export const StreetViewViewer: React.FC<StreetViewViewerProps> = ({
   // High-resolution archival photographic asset if StreetView 3D tiles fail or for manual toggle
   const archivalPhotoUrl =
     (challenge.id.startsWith('indo-') && challenge.levelNumber && INDONESIA_IMAGE_MAP[challenge.levelNumber]) ||
+    (challenge.id === 'indo-49-sentani-danau' && '/city-images/indo_danau_sentani.jpg') ||
     (challenge.id === 'indo-50-papua-danau-sentani' && '/city-images/indo_danau_sentani.jpg') ||
     (!challenge.id.startsWith('indo-') && challenge.levelNumber && LEVEL_IMAGE_MAP[challenge.levelNumber]) ||
     (challenge.panoId

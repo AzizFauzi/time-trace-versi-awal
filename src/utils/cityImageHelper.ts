@@ -161,7 +161,7 @@ export const INDONESIA_IMAGE_MAP: Record<number, string> = {
   46: '/city-images/indo_46_ambon.png',             // Ambon (Jembatan Merah Putih)
   47: '/city-images/indo_47_ternate.png',           // Ternate (Benteng Tolukko & Gunung Gamalama)
   48: '/city-images/indo_48_jayapura.png',          // Jayapura (Jembatan Youtefa)
-  49: '/city-images/indo_49_sentani.png',           // Sentani (Danau Sentani & Bukit Tungkuwiri)
+  49: '/city-images/indo_danau_sentani.jpg',        // Sentani (Danau Sentani & Bukit Tungkuwiri)
   50: '/city-images/indo_50_sorong.png',            // Sorong (Pelabuhan Pesisir Sorong Raja Ampat)
 };
 

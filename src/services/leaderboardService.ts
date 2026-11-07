@@ -152,7 +152,7 @@ export const submitPlayerScore = async (
   casesSolved: number = 1,
   accuracyPct: number = 85
 ): Promise<boolean> => {
-  if (score <= 0) return false;
+  const safeScore = Math.max(0, score);
 
   const nickname = getPlayerNickname();
   const avatar = getPlayerAvatar();
@@ -162,7 +162,7 @@ export const submitPlayerScore = async (
       const { error } = await supabase.from('leaderboard').insert([
         {
           nickname,
-          score,
+          score: safeScore,
           cases_solved: casesSolved,
           accuracy_pct: accuracyPct,
           avatar,

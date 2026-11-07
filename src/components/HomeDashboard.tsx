@@ -41,7 +41,7 @@ import { getExploredLocations } from '../utils/cityImageHelper';
 import { getRankAssetByStars } from '../utils/rankAssets';
 import { soundManager } from '../utils/soundManager';
 import { BlogArticle, BLOG_ARTICLES } from '../data/blogArticles';
-import { fetchLeaderboard, getPlayerNickname, setPlayerNickname, LeaderboardPlayer } from '../services/leaderboardService';
+import { fetchLeaderboard, getPlayerNickname, setPlayerNickname, submitPlayerScore, LeaderboardPlayer } from '../services/leaderboardService';
 import { BlogReaderModal } from './BlogReaderModal';
 import logoImg from '../assets/logo.png';
 
@@ -329,7 +329,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
     };
   }, [leaderboardPeriod, gamification.coins, playerNickname]);
 
-  const handleSaveNickname = (e: React.FormEvent) => {
+  const handleSaveNickname = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = nicknameDraft.trim();
     if (trimmed) {
@@ -338,6 +338,20 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
       try {
         soundManager.playCorrect();
       } catch (_) {}
+
+      // Immediately sync with Supabase leaderboard table!
+      try {
+        await submitPlayerScore(
+          Math.max(0, gamification?.coins || 500),
+          casesCompleted || 1,
+          85
+        );
+        const res = await fetchLeaderboard(gamification?.coins || 500, leaderboardPeriod);
+        setLeaderboardList(res.players);
+        setIsLiveLeaderboard(res.isLive);
+      } catch (err) {
+        console.warn('Failed syncing nickname to Supabase:', err);
+      }
     }
     setIsEditingNickname(false);
   };

@@ -126,8 +126,8 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
                 {lang === 'en' ? '🎯 The Time Detective Objective:' : '🎯 Misi Utama Detektif Waktu:'}
               </strong>
               {lang === 'en'
-                ? 'You are dropped into historical 360° panoramas from Google Street View archives. Street and place names are deliberately obscured. Your mission is to deduce WHERE you are and in WHAT YEAR the photo was taken!'
-                : 'Kamu diterjunkan ke dalam rekaman panorama 360° arsip masa lalu Google Street View. Semua plang nama jalan dan alamat disembunyikan. Tugasmu adalah mengungkap di mana lokasinya dan pada tahun berapa foto tersebut direkam!'}
+                ? 'You are presented with authentic historical archival street photographs. Street names and specific location texts are obscured. Your mission is to deduce WHERE the scene took place and in WHAT YEAR the photograph was captured!'
+                : 'Kamu dihadapkan pada foto arsip bersejarah masa lalu berkualitas tinggi. Plang nama jalan dan petunjuk lokasi utama disamarkan. Tugasmu adalah menganalisis dan mengungkap di mana LOKASI kota tersebut serta pada TAHUN BERAPA foto direkam!'}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -139,16 +139,16 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
                   </div>
                   <h4 className="text-sm font-bold text-white flex items-center gap-1.5 mb-1.5">
                     <Camera className="w-4 h-4 text-amber-400" />
-                    <span>{lang === 'en' ? 'Explore 360° Panoramas' : 'Eksplorasi Panorama 360°'}</span>
+                    <span>{lang === 'en' ? 'Inspect Historical Photographs' : 'Analisis Foto Arsip Bersejarah'}</span>
                   </h4>
                   <p className="text-xs text-slate-300 leading-relaxed">
                     {lang === 'en'
-                      ? 'Click and drag to look around 360°. Use the Zoom In (+) and Zoom Out (-) buttons to inspect car license plates, shop signs, movie posters, and people in the distance.'
-                      : 'Klik dan geser layar untuk memutar kamera 360°. Gunakan tombol Zoom In (+) dan Zoom Out (-) untuk membaca pelat nomor mobil, papan reklame, toko, dan busana orang dari kejauhan.'}
+                      ? 'Examine every detail of the archival photograph. Observe vehicle models, architectural styles, shop signs, clothing fashion, road infrastructure, and surrounding cultural clues.'
+                      : 'Amati setiap detail foto arsip secara saksama. Perhatikan model kendaraan di jalan, gaya arsitektur gedung, plang toko, tren busana pejalan kaki, dan petunjuk budaya di sekitarnya.'}
                   </p>
                 </div>
                 <div className="mt-3 text-[11px] text-slate-500 font-mono">
-                  {lang === 'en' ? 'Tip: Look up at skyscrapers or down at road markings' : 'Tips: Tengok ke atas gedung atau marka aspal jalan'}
+                  {lang === 'en' ? 'Tip: Pay attention to car models, building styles, and advertisements' : 'Tips: Perhatikan bentuk mobil, gaya bangunan, dan papan reklame'}
                 </div>
               </div>
 
@@ -181,16 +181,16 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
                   </div>
                   <h4 className="text-sm font-bold text-white flex items-center gap-1.5 mb-1.5">
                     <MapPin className="w-4 h-4 text-emerald-400" />
-                    <span>{lang === 'en' ? 'Pin Location on the Map' : 'Tandai Lokasi pada Peta'}</span>
+                    <span>{lang === 'en' ? 'Type or Pin City Location' : 'Ketik & Tentukan Lokasi Kota'}</span>
                   </h4>
                   <p className="text-xs text-slate-300 leading-relaxed">
                     {lang === 'en'
-                      ? 'Click anywhere on the mini-map to drop your guess pin. You can expand the map to full-view anytime for precise zooming down to street level.'
-                      : 'Klik pada peta mini untuk menaruh pin tebakanmu. Gunakan tombol perbesar peta (expand) untuk melihat jalan dan kota dengan lebih akurat.'}
+                      ? 'Type the city or place name in the search bar to automatically drop your guess pin, or click directly on the interactive map.'
+                      : 'Ketik nama kota atau wilayah pada kolom pencarian peta untuk langsung menaruh pin tebakan secara cepat dan presisi, atau klik langsung pada area peta.'}
                   </p>
                 </div>
                 <div className="mt-3 text-[11px] text-slate-500 font-mono">
-                  {lang === 'en' ? 'Tip: Up to 5,000 pts based on distance accuracy' : 'Tips: Nilai hingga 5.000 pts jika pin sangat dekat'}
+                  {lang === 'en' ? 'Tip: Type cities like "Jakarta", "Tokyo", or "Paris" for instant precision' : 'Tips: Ketik kota seperti "Jakarta", "Surabaya", "Tokyo" untuk pin instan'}
                 </div>
               </div>
 
@@ -211,7 +211,7 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
                   </p>
                 </div>
                 <div className="mt-3 text-[11px] text-slate-500 font-mono">
-                  {lang === 'en' ? 'Tip: Score ≥ 2,500 pts to clear the level!' : 'Tips: Butuh minimal 2.500 pts untuk lulus level'}
+                  {lang === 'en' ? 'Tip: Score ≥ 3,000 pts and close location to pass!' : 'Tips: Butuh skor ≥ 3.000 pts dan lokasi akurat untuk lulus'}
                 </div>
               </div>
             </div>
@@ -223,8 +223,8 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
             <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200">
               💡 {lang === 'en'
-                ? 'Street View archives range from 2007 through recent years. Use these three pillars of visual forensic clues:'
-                : 'Arsip Street View berada pada rentang tahun 2007 hingga beberapa tahun lalu. Gunakan 3 pilar petunjuk forensik visual berikut:'}
+                ? 'Historical photo archives range from 2007 through recent years. Use these three pillars of visual forensic clues:'
+                : 'Arsip foto sejarah berada pada rentang tahun 2007 hingga era modern. Gunakan 3 pilar petunjuk forensik visual berikut:'}
             </div>
 
             {/* Pillar 1: Vehicles */}
@@ -487,8 +487,8 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({
                 </h4>
                 <p className="text-xs text-slate-300 leading-relaxed">
                   {lang === 'en'
-                    ? 'Use your earned Chrono Coins to purchase and equip vintage filters. The VHS 90s Lens displays real CRT scanlines and OSD recording counters on your Street View screen, while the Sepia 70s Lens adds a warm nostalgic film vignette!'
-                    : 'Gunakan Koin Penjelajah yang kamu kumpulkan untuk membeli dan memasang lensa kamera antik. Lensa VHS 90-an menampilkan scanlines TV tabung analog & timestamp REC nyata di layar Street View, sedangkan Lensa Sepia 70-an memberikan nuansa album foto nostalgia!'}
+                    ? 'Use your earned Chrono Coins to purchase and equip vintage filters. The VHS 90s Lens displays real CRT scanlines and OSD recording counters on your photo screen, while the Sepia 70s Lens adds a warm nostalgic film vignette!'
+                    : 'Gunakan Koin Penjelajah yang kamu kumpulkan untuk membeli dan memasang lensa kamera antik. Lensa VHS 90-an menampilkan scanlines TV tabung analog & timestamp REC nyata di layar foto, sedangkan Lensa Sepia 70-an memberikan nuansa album foto nostalgia!'}
                 </p>
               </div>
             </div>

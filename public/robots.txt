@@ -1,0 +1,9 @@
+# Time Trace - Robots Configuration
+# https://timetrace.fun
+
+User-agent: *
+Allow: /
+
+# Sitemap Index
+Sitemap: https://timetrace.fun/sitemap.xml
+

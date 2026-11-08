@@ -215,6 +215,30 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
     } catch (_) {}
   }, []);
 
+  // Dynamic Document Title and URL query synchronization for Articles
+  useEffect(() => {
+    if (selectedArticle) {
+      const articleTitle = isEn ? selectedArticle.title.en : selectedArticle.title.id;
+      document.title = `${articleTitle} | Time Trace Journal`;
+      try {
+        const url = new URL(window.location.href);
+        if (url.searchParams.get('article') !== selectedArticle.slug) {
+          url.searchParams.set('article', selectedArticle.slug);
+          window.history.replaceState({}, '', url.toString());
+        }
+      } catch (_) {}
+    } else {
+      document.title = 'Time Trace | Misteri Kronologis & Penjelajah Waktu';
+      try {
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('article')) {
+          url.searchParams.delete('article');
+          window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+        }
+      } catch (_) {}
+    }
+  }, [selectedArticle, isEn]);
+
   const filteredArticles = selectedBlogCategory === 'all'
     ? BLOG_ARTICLES
     : BLOG_ARTICLES.filter(

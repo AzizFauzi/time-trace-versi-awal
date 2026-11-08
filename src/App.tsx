@@ -697,7 +697,7 @@ export default function App() {
   };
 
   const handleResetAllProgress = () => {
-    soundManager.playClick();
+    soundManager.playTick();
     const confirmMsg =
       lang === 'en'
         ? 'Are you sure you want to reset all game progress from scratch? All levels, cases, and coins will be reset.'

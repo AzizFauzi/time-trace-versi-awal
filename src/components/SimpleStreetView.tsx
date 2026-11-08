@@ -73,7 +73,7 @@ export const SimpleStreetView: React.FC<SimpleStreetViewProps> = ({
       {loading && !imgError && (
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white/60 gap-3 z-10">
           <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm">{t['loading'] ?? 'Loading...'}</span>
+          <span className="text-sm">{t.loadingStreetView || (lang === 'en' ? 'Loading...' : 'Memuat...')}</span>
         </div>
       )}
 
@@ -82,7 +82,7 @@ export const SimpleStreetView: React.FC<SimpleStreetViewProps> = ({
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white/60 gap-3">
           <span className="text-5xl">🗺️</span>
           <span className="text-sm text-center px-4">
-            {t['image_load_error'] ?? 'Image not available for this location.'}
+            {lang === 'en' ? 'Image not available for this location.' : 'Gambar arsip tidak tersedia untuk lokasi ini.'}
           </span>
           <span className="text-xs text-white/30">{challenge.city}</span>
         </div>

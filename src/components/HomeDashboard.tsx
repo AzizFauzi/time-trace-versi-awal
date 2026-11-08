@@ -1599,6 +1599,8 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           lang={lang}
           onStartCampaign={onStartCampaign}
           onSelectArticle={(a) => setSelectedArticle(a)}
+          dailyChances={dailyChances}
+          onOpenWaitlist={onOpenWaitlist}
         />
       )}
     </div>

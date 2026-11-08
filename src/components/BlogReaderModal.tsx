@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Play,
+  Heart,
   Lightbulb,
   Sparkles,
   BookOpen,
@@ -15,6 +16,7 @@ import {
 import { BlogArticle, BLOG_ARTICLES } from '../data/blogArticles';
 import { Language } from '../utils/i18n';
 import { soundManager } from '../utils/soundManager';
+import { DailyChances } from '../utils/progress';
 
 interface BlogReaderModalProps {
   article: BlogArticle | null;
@@ -22,6 +24,8 @@ interface BlogReaderModalProps {
   lang: Language;
   onStartCampaign?: (levelNumber: number) => void;
   onSelectArticle?: (article: BlogArticle) => void;
+  dailyChances?: DailyChances;
+  onOpenWaitlist?: () => void;
 }
 
 export const BlogReaderModal: React.FC<BlogReaderModalProps> = ({
@@ -30,6 +34,8 @@ export const BlogReaderModal: React.FC<BlogReaderModalProps> = ({
   lang,
   onStartCampaign,
   onSelectArticle,
+  dailyChances,
+  onOpenWaitlist,
 }) => {
   const [copied, setCopied] = useState<boolean>(false);
   const isEn = lang === 'en';
@@ -60,7 +66,7 @@ export const BlogReaderModal: React.FC<BlogReaderModalProps> = ({
       soundManager.playTick();
     } catch (_) {}
 
-    const url = `${window.location.origin}?article=${article.slug}`;
+    const url = `https://timetrace.fun?article=${article.slug}`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url).then(() => {
         setCopied(true);
@@ -70,6 +76,18 @@ export const BlogReaderModal: React.FC<BlogReaderModalProps> = ({
   };
 
   const handlePlayRelated = () => {
+    // If daily chances are exhausted, block gameplay and open VIP Waitlist modal
+    if (dailyChances && dailyChances.remaining <= 0) {
+      try {
+        soundManager.playModalOpen();
+      } catch (_) {}
+      onClose();
+      if (onOpenWaitlist) {
+        onOpenWaitlist();
+      }
+      return;
+    }
+
     if (article.relatedLevel && onStartCampaign) {
       try {
         soundManager.playCorrect();
@@ -247,10 +265,23 @@ export const BlogReaderModal: React.FC<BlogReaderModalProps> = ({
 
               <button
                 onClick={handlePlayRelated}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-sm tracking-wide shadow-lg shadow-amber-500/25 flex items-center gap-2 cursor-pointer transition active:scale-98 shrink-0"
+                className={`px-6 py-3 rounded-xl font-black text-sm tracking-wide shadow-lg flex items-center gap-2 cursor-pointer transition active:scale-98 shrink-0 ${
+                  dailyChances && dailyChances.remaining <= 0
+                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/50 hover:bg-rose-500/30'
+                    : 'bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-amber-500/25'
+                }`}
               >
-                <Play className="w-4 h-4 fill-current ml-0.5" />
-                <span>{isEn ? 'Play This Case Now' : 'Mainkan Kasus Ini Sekarang'}</span>
+                {dailyChances && dailyChances.remaining <= 0 ? (
+                  <>
+                    <Heart className="w-4 h-4 text-rose-400 shrink-0 fill-rose-400/40" />
+                    <span>{isEn ? 'Out of Lives • VIP Pass' : 'Nyawa Habis • Buka VIP'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4 fill-current ml-0.5" />
+                    <span>{isEn ? 'Play This Case Now' : 'Mainkan Kasus Ini Sekarang'}</span>
+                  </>
+                )}
               </button>
             </div>
           )}

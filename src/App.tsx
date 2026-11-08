@@ -260,12 +260,8 @@ export default function App() {
 
   // Start campaign at a specific level (1-100)
   const startCampaignLevel = (levelNumber: number) => {
-    const isAlreadyPassed = Boolean(
-      playerProgress.levels[levelNumber] && playerProgress.levels[levelNumber].score >= MINIMUM_PASS_SCORE
-    );
-
-    // If level is uncleared and no daily chances left, block and open VIP subscription modal
-    if (!isAlreadyPassed && dailyChances.remaining <= 0) {
+    // If no daily chances left, strictly block and open VIP subscription modal
+    if (dailyChances.remaining <= 0) {
       soundManager.playModalOpen();
       setIsPremiumWaitlistOpen(true);
       return;
@@ -337,11 +333,8 @@ export default function App() {
 
   // Start Indonesia heritage campaign (50 sequential cases)
   const startIndonesiaCampaign = (caseNumber: number = 1) => {
-    const isAlreadyPassed = Boolean(
-      indonesiaProgress.cases[caseNumber] && indonesiaProgress.cases[caseNumber].score >= MINIMUM_PASS_SCORE
-    );
-
-    if (!isAlreadyPassed && dailyChances.remaining <= 0) {
+    // If no daily chances left, strictly block and open VIP subscription modal
+    if (dailyChances.remaining <= 0) {
       soundManager.playModalOpen();
       setIsPremiumWaitlistOpen(true);
       return;

@@ -166,7 +166,7 @@ export const RoundResultModal: React.FC<RoundResultModalProps> = ({
 
   const handleSocialShare = (platform: 'whatsapp' | 'instagram' | 'x' | 'facebook') => {
     const text = generateShareText();
-    const currentUrl = window.location.href;
+    const currentUrl = 'https://timetrace.fun';
 
     if (platform === 'whatsapp') {
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text + ' ' + currentUrl)}`, '_blank');
